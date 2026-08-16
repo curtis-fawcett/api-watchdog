@@ -1,0 +1,5 @@
+URL,Test Result,Status Code,Response Time
+https://jsonplaceholder.typicode.com/users,PASS,200,158
+https://jsonplaceholder.typicode.com/users,PASS,200,114
+,,,
+https://jsonplaceholder.typicode.com/users,PASS,200,191

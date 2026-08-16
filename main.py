@@ -1,4 +1,8 @@
 import requests
+import csv
+import os
+
+history_file = "api_history.csv"
 
 def test_api(url):
     if url == "":
@@ -24,8 +28,17 @@ def test_api(url):
             response_time = int(response.elapsed.total_seconds() * 1000)
             return result, response.status_code, response_time
 url = input("Enter API URL: ").strip()
+
 test_result, status_code, response_time = test_api(url)
+
 if test_result is not None:
+    file_exists = os.path.exists(history_file)
+
+    with open(history_file, "a", newline="") as file:
+        writer = csv.writer(file)
+        if not file_exists:
+            writer.writerow(["URL", "Test Result", "Status Code", "Response Time"])
+        writer.writerow([url, test_result, status_code, response_time])
     print("Result:", test_result)
     print("Status Code:", status_code)
     print("Response Time:", response_time, "ms")
