@@ -1,16 +1,30 @@
 import requests
 
-url = "https://jsonplaceholder.typicode.com/users"
+url = input("Enter API URL: ").strip()
 
-response = requests.get(url)
+if url == "":
+    print("URL cannot be empty")
 
-print("Status Code:", response.status_code)
-
-if response.status_code == 200:
-    print("PASS")
 else:
-    print("FAIL")
 
-response_time = int(response.elapsed.total_seconds() * 1000)
+    try:
+        response = requests.get(url, timeout=5)
 
-print("Response Time:" , response_time, "ms")
+    except requests.exceptions.ConnectionError:
+        print("Connection failed")
+    except requests.exceptions.Timeout:
+        print("Connection timed out")
+    except requests.exceptions.MissingSchema:
+        print("Invalid URL. Include http:// or https://")
+
+    else:
+        print("Status Code:", response.status_code)
+
+        if response.status_code == 200:
+            print("PASS")
+        else:
+            print("FAIL")
+
+        response_time = int(response.elapsed.total_seconds() * 1000)
+
+        print("Response Time:" , response_time, "ms")
