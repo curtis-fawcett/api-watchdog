@@ -1,5 +1,3 @@
-URL,Test Result,Status Code,Response Time
-https://jsonplaceholder.typicode.com/users,PASS,200,158
-https://jsonplaceholder.typicode.com/users,PASS,200,114
-,,,
-https://jsonplaceholder.typicode.com/users,PASS,200,191
+Time,URL,Test Result,Status Code,Response Time
+2026-08-16 17:26:09,https://jsonplaceholder.typicode.com/users,PASS,200,253
+2026-08-16 17:27:21,https://jsonplaceholder.typicode.com/users,PASS,200,126

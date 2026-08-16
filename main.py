@@ -1,8 +1,10 @@
 import requests
 import csv
 import os
+from datetime import datetime
 
 history_file = "api_history.csv"
+timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 def test_api(url):
     if url == "":
@@ -37,8 +39,8 @@ if test_result is not None:
     with open(history_file, "a", newline="") as file:
         writer = csv.writer(file)
         if not file_exists:
-            writer.writerow(["URL", "Test Result", "Status Code", "Response Time"])
-        writer.writerow([url, test_result, status_code, response_time])
+            writer.writerow(["Time", "URL", "Test Result", "Status Code", "Response Time"])
+        writer.writerow([timestamp, url, test_result, status_code, response_time])
     print("Result:", test_result)
     print("Status Code:", status_code)
     print("Response Time:", response_time, "ms")
