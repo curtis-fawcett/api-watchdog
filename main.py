@@ -7,20 +7,59 @@ history_file = "api_history.csv"
 timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 def show_history(history_file):
+    print("API Test History")
+    print()
+    print("1. All tests")
+    print("2. Failed tests")
+    print("3. Last 5 tests")
+    print("4. Exit")
 
-        file_exists = os.path.exists(history_file)
+    history_choice = input("Choose an option: ").strip()
+    file_exists = os.path.exists(history_file)
 
+    if history_choice == "1":
         if file_exists:
-
             with open(history_file, "r") as file:
                 reader = csv.reader(file)
 
                 next(reader)
 
                 for row in reader:
-                    print("Time:", row[0], "|", "URL:", row[1], "|", "Result:", row[2], "|", "Status:", row[3], "|", "Response Time:", row[4], "ms")
+                    print("Time:", row[0], "|", "URL:", row[1], "|", "Result:", row[2], "|", "Status:", row[3], "|",
+                          "Response Time:", row[4], "ms")
         else:
             print("No History found")
+    elif history_choice == "2":
+        if file_exists:
+            with open(history_file, "r") as file:
+                reader = csv.reader(file)
+
+                next(reader)
+
+                for row in reader:
+                    if row[2] == "FAIL":
+                        print("Time:", row[0], "|", "URL:", row[1], "|", "Result:", row[2], "|", "Status:", row[3], "|",
+                              "Response Time:", row[4], "ms")
+        else:
+            print("No History found")
+
+    elif history_choice == "3":
+        rows = []
+        if file_exists:
+            with open(history_file, "r") as file:
+                reader = csv.reader(file)
+
+                next(reader)
+
+                for row in reader:
+                    rows.append(row)
+
+                for row in rows[-5:]:
+                    print("Time:", row[0], "|", "URL:", row[1], "|", "Result:", row[2], "|", "Status:", row[3], "|",
+                          "Response Time:", row[4], "ms")
+
+    elif history_choice == "4":
+        return
 
 def test_api(url):
     if url == "":
