@@ -21,6 +21,10 @@ def load_history(history_file):
 
     return rows
 
+def print_history_row(row):
+    print("Time:", row[0], "|", "URL:", row[1], "|", "Result:", row[2], "|", "Status:", row[3], "|",
+          "Response Time:", row[4], "ms")
+
 def show_history(history_file):
     print("API Test History")
     print()
@@ -35,8 +39,7 @@ def show_history(history_file):
     if history_choice == "1":
         if rows:
             for row in rows:
-                print("Time:", row[0], "|", "URL:", row[1], "|", "Result:", row[2], "|", "Status:", row[3], "|",
-                      "Response Time:", row[4], "ms")
+                print_history_row(row)
         else:
             print("No History found")
 
@@ -44,16 +47,14 @@ def show_history(history_file):
         if rows:
             for row in rows:
                 if row[2] == "FAIL":
-                    print("Time:", row[0], "|", "URL:", row[1], "|", "Result:", row[2], "|", "Status:", row[3], "|",
-                            "Response Time:", row[4], "ms")
+                    print_history_row(row)
         else:
             print("No History found")
 
     elif history_choice == "3":
         if rows:
             for row in rows[-5:]:
-                print("Time:", row[0], "|", "URL:", row[1], "|", "Result:", row[2], "|", "Status:", row[3], "|",
-                      "Response Time:", row[4], "ms")
+                print_history_row(row)
         else:
             print("No History found")
 
