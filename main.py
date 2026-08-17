@@ -45,20 +45,36 @@ def test_api(url):
                 result = "FAIL"
             response_time = int(response.elapsed.total_seconds() * 1000)
             return result, response.status_code, response_time
-url = input("Enter API URL: ").strip()
 
-test_result, status_code, response_time = test_api(url)
+while True:
+    print("API Watchdog")
+    print()
+    print("1. Test an API")
+    print("2. View test history")
+    print("3. Exit")
 
-if test_result:
-    file_exists = os.path.exists(history_file)
+    choice = input("Choose an option: ").strip()
+    if choice == "1":
+        url = input("Enter API URL: ").strip()
+        test_result, status_code, response_time = test_api(url)
+        if test_result is not None:
+            file_exists = os.path.exists(history_file)
 
-    with open(history_file, "a", newline="") as file:
-        writer = csv.writer(file)
-        if not file_exists:
-            writer.writerow(["Time", "URL", "Test Result", "Status Code", "Response Time"])
-        writer.writerow([timestamp, url, test_result, status_code, response_time])
-    print("Result:", test_result)
-    print("Status Code:", status_code)
-    print("Response Time:", response_time, "ms")
+            with open(history_file, "a", newline="") as file:
+                writer = csv.writer(file)
+                if not file_exists:
+                    writer.writerow(["Time", "URL", "Test Result", "Status Code", "Response Time"])
+                writer.writerow([timestamp, url, test_result, status_code, response_time])
+            print("Result:", test_result)
+            print("Status Code:", status_code)
+            print("Response Time:", response_time, "ms")
 
-show_history(history_file)
+    elif choice == "2":
+        show_history(history_file)
+
+    elif choice == "3":
+        print("Goodbye!")
+        break
+
+    else:
+        print("Please choose an option from the menu")
