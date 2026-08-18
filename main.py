@@ -26,64 +26,73 @@ def print_history_row(row):
           "Response Time:", row[4], "ms")
 
 def show_history(history_file):
-    print("API Test History")
-    print()
-    print("1. All tests")
-    print("2. Failed tests")
-    print("3. Last 5 tests")
-    print("4. Exit")
+    while True:
+        print("API Test History")
+        print()
+        print("1. All tests")
+        print("2. Failed tests")
+        print("3. Last 5 tests")
+        print("4. Exit")
 
-    history_choice = input("Choose an option: ").strip()
-    rows = load_history(history_file)
+        history_choice = input("Choose an option: ").strip()
+        rows = load_history(history_file)
 
-    if history_choice == "1":
-        if rows:
-            for row in rows:
-                print_history_row(row)
-        else:
-            print("No History found")
-
-    elif history_choice == "2":
-        if rows:
-            for row in rows:
-                if row[2] == "FAIL":
+        if history_choice == "1":
+            if rows:
+                for row in rows:
                     print_history_row(row)
-        else:
-            print("No History found")
+            else:
+                print("No History found")
 
-    elif history_choice == "3":
-        if rows:
-            for row in rows[-5:]:
-                print_history_row(row)
-        else:
-            print("No History found")
+        elif history_choice == "2":
+            if rows:
+                for row in rows:
+                    if row[2] == "FAIL":
+                        print_history_row(row)
+            else:
+                print("No History found")
 
-    elif history_choice == "4":
-        return
+        elif history_choice == "3":
+            if rows:
+                for row in rows[-5:]:
+                    print_history_row(row)
+            else:
+                print("No History found")
+
+        elif history_choice == "4":
+            return
+
+        else:
+            print("Please choose an option from the history menu")
 
 def test_api(url):
     if url == "":
         print("URL cannot be empty")
         return None, None, None
+
+    try:
+        response = requests.get(url, timeout=5)
+
+    except requests.exceptions.ConnectionError:
+        print("Connection failed")
+        return None, None, None
+
+    except requests.exceptions.Timeout:
+        print("Connection timed out")
+        return None, None, None
+
+    except requests.exceptions.MissingSchema:
+        print("Invalid URL. Include http:// or https://")
+        return None, None, None
+
+    if response.status_code == 200:
+        result = "PASS"
     else:
-        try:
-            response = requests.get(url, timeout=5)
-        except requests.exceptions.ConnectionError:
-            print("Connection failed")
-            return None, None, None
-        except requests.exceptions.Timeout:
-            print("Connection timed out")
-            return None, None, None
-        except requests.exceptions.MissingSchema:
-            print("Invalid URL. Include http:// or https://")
-            return None, None, None
-        else:
-            if response.status_code == 200:
-                result = "PASS"
-            else:
-                result = "FAIL"
-            response_time = int(response.elapsed.total_seconds() * 1000)
-            return result, response.status_code, response_time
+        result = "FAIL"
+
+    response_time = int(response.elapsed.total_seconds() * 1000)
+
+    return result, response.status_code, response_time
 
 while True:
     print("API Watchdog")

@@ -26,3 +26,5 @@ Time,URL,Test Result,Status Code,Response Time
 2026-08-17 17:14:59,https://jsonplaceholder.typicode.com/users,PASS,200,170
 2026-08-17 17:31:39,https://jsonplaceholder.typicode.com/users,PASS,200,127
 2026-08-17 17:32:02,https://jsonplaceholder.typicode.com/users,PASS,200,114
+2026-08-17 17:51:01,https://jsonplaceholder.typicode.com/users,PASS,200,153
+2026-08-17 17:51:14,https://jsonplaceholder.typicode.com/not-a-real-page,FAIL,404,146
