@@ -115,6 +115,11 @@ def save_result(history_file, timestamp, url, test_result, status_code, response
 
         writer.writerow([timestamp, url, test_result, status_code, response_time])
 
+def print_test_result(test_result, status_code, response_time):
+    print("Result:", test_result)
+    print("Status Code:", status_code)
+    print("Response Time:", response_time, "ms")
+
 while True:
     print("API Watchdog")
     print()
@@ -131,10 +136,7 @@ while True:
         if test_result is not None:
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             save_result(history_file, timestamp, url, test_result, status_code, response_time)
-
-            print("Result:", test_result)
-            print("Status Code:", status_code)
-            print("Response Time:", response_time, "ms")
+            print_test_result(test_result, status_code, response_time)
 
     elif choice == "2":
         show_history(history_file)
