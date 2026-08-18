@@ -32,7 +32,7 @@ def show_history(history_file):
         print("1. All tests")
         print("2. Failed tests")
         print("3. Last 5 tests")
-        print("4. Exit")
+        print("4. Back to main menu")
 
         history_choice = input("Choose an option: ").strip()
         rows = load_history(history_file)
@@ -46,9 +46,13 @@ def show_history(history_file):
 
         elif history_choice == "2":
             if rows:
+                failed_found = False
                 for row in rows:
                     if row[2] == "FAIL":
+                        failed_found = True
                         print_history_row(row)
+                if not failed_found:
+                    print("No failed tests found")
             else:
                 print("No History found")
 
