@@ -58,6 +58,12 @@ def show_history(history_file):
 
         elif history_choice == "3":
             if rows:
+                history_count = len(rows)
+                if history_count < 5:
+                    if history_count == 1:
+                        print("Only", history_count, "test found. Showing the available test.")
+                    else:
+                        print("Only", history_count, "tests found. Showing all available tests.")
                 for row in rows[-5:]:
                     print_history_row(row)
             else:
