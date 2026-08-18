@@ -120,6 +120,15 @@ def print_test_result(test_result, status_code, response_time):
     print("Status Code:", status_code)
     print("Response Time:", response_time, "ms")
 
+def run_api_test(history_file):
+    url = input("Enter API URL: ").strip()
+    test_result, status_code, response_time = test_api(url)
+
+    if test_result is not None:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        save_result(history_file, timestamp, url, test_result, status_code, response_time)
+        print_test_result(test_result, status_code, response_time)
+
 while True:
     print("API Watchdog")
     print()
@@ -130,13 +139,7 @@ while True:
     choice = input("Choose an option: ").strip()
 
     if choice == "1":
-        url = input("Enter API URL: ").strip()
-        test_result, status_code, response_time = test_api(url)
-
-        if test_result is not None:
-            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            save_result(history_file, timestamp, url, test_result, status_code, response_time)
-            print_test_result(test_result, status_code, response_time)
+        run_api_test(history_file)
 
     elif choice == "2":
         show_history(history_file)
