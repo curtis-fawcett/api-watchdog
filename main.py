@@ -104,6 +104,17 @@ def test_api(url):
 
     return result, response.status_code, response_time
 
+def save_result(history_file, timestamp, url, test_result, status_code, response_time):
+    file_exists = os.path.exists(history_file)
+
+    with open(history_file, "a", newline="") as file:
+        writer = csv.writer(file)
+
+        if not file_exists:
+            writer.writerow(["Time", "URL", "Test Result", "Status Code", "Response Time"])
+
+        writer.writerow([timestamp, url, test_result, status_code, response_time])
+
 while True:
     print("API Watchdog")
     print()
@@ -112,18 +123,15 @@ while True:
     print("3. Exit")
 
     choice = input("Choose an option: ").strip()
+
     if choice == "1":
         url = input("Enter API URL: ").strip()
         test_result, status_code, response_time = test_api(url)
+
         if test_result is not None:
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            file_exists = os.path.exists(history_file)
+            save_result(history_file, timestamp, url, test_result, status_code, response_time)
 
-            with open(history_file, "a", newline="") as file:
-                writer = csv.writer(file)
-                if not file_exists:
-                    writer.writerow(["Time", "URL", "Test Result", "Status Code", "Response Time"])
-                writer.writerow([timestamp, url, test_result, status_code, response_time])
             print("Result:", test_result)
             print("Status Code:", status_code)
             print("Response Time:", response_time, "ms")
