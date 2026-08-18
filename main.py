@@ -129,24 +129,28 @@ def run_api_test(history_file):
         save_result(history_file, timestamp, url, test_result, status_code, response_time)
         print_test_result(test_result, status_code, response_time)
 
-while True:
-    print("API Watchdog")
-    print()
-    print("1. Test an API")
-    print("2. View test history")
-    print("3. Exit")
+def main():
+    while True:
+        print("API Watchdog")
+        print()
+        print("1. Test an API")
+        print("2. View test history")
+        print("3. Exit")
 
-    choice = input("Choose an option: ").strip()
+        choice = input("Choose an option: ").strip()
 
-    if choice == "1":
-        run_api_test(history_file)
+        if choice == "1":
+            run_api_test(history_file)
 
-    elif choice == "2":
-        show_history(history_file)
+        elif choice == "2":
+            show_history(history_file)
 
-    elif choice == "3":
-        print("Goodbye!")
-        break
+        elif choice == "3":
+            print("Goodbye!")
+            break
 
-    else:
-        print("Please choose an option from the menu")
+        else:
+            print("Please choose an option from the menu")
+
+if __name__ == "__main__":
+    main()
