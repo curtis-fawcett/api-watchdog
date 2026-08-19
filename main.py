@@ -3,6 +3,8 @@ import csv
 import os
 from datetime import datetime
 
+from Cython.Compiler.Parsing import p_assert_statement
+
 history_file = "api_history.csv"
 
 def load_history(history_file):
@@ -25,6 +27,28 @@ def print_history_row(row):
     print("Time:", row[0], "|", "URL:", row[1], "|", "Result:", row[2], "|", "Status:", row[3], "|",
           "Response Time:", row[4], "ms")
 
+def show_statistics(rows):
+    total_tests = len(rows)
+    passed_tests = 0
+
+    for row in rows:
+        if row[2] == "PASS":
+            passed_tests += 1
+
+    failed_tests = total_tests - passed_tests
+
+    if total_tests == 0:
+        pass_rate = 0
+    else:
+        pass_rate = round(passed_tests / total_tests * 100, 1)
+
+    print("API Statistics")
+    print()
+    print("Total Tests:", total_tests)
+    print("Passed:", passed_tests)
+    print("Failed:", failed_tests)
+    print("Pass Rate:", pass_rate, "%")
+
 def show_history(history_file):
     while True:
         print("API Test History")
@@ -32,7 +56,8 @@ def show_history(history_file):
         print("1. All tests")
         print("2. Failed tests")
         print("3. Last 5 tests")
-        print("4. Back to main menu")
+        print("4. Statistics")
+        print("5. Back to main menu")
 
         history_choice = input("Choose an option: ").strip()
         rows = load_history(history_file)
@@ -70,6 +95,9 @@ def show_history(history_file):
                 print("No History found")
 
         elif history_choice == "4":
+            show_statistics(rows)
+
+        elif history_choice == "5":
             return
 
         else:
