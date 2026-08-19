@@ -30,17 +30,21 @@ def print_history_row(row):
 def show_statistics(rows):
     total_tests = len(rows)
     passed_tests = 0
+    total_response_time = 0
 
     for row in rows:
         if row[2] == "PASS":
             passed_tests += 1
+        total_response_time += int(row[4])
 
     failed_tests = total_tests - passed_tests
 
     if total_tests == 0:
         pass_rate = 0
+        average_response_time = 0
     else:
         pass_rate = round(passed_tests / total_tests * 100, 1)
+        average_response_time = round(total_response_time / total_tests, 1)
 
     print("API Statistics")
     print()
@@ -48,6 +52,7 @@ def show_statistics(rows):
     print("Passed:", passed_tests)
     print("Failed:", failed_tests)
     print("Pass Rate:", pass_rate, "%")
+    print("Average Response Time:", average_response_time, "ms")
 
 def show_history(history_file):
     while True:
