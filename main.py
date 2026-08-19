@@ -32,6 +32,7 @@ def show_statistics(rows):
     passed_tests = 0
     total_response_time = 0
     fastest_response_time = None
+    slowest_response_time = None
 
     for row in rows:
         response_time = int(row[4])
@@ -41,6 +42,9 @@ def show_statistics(rows):
 
         if fastest_response_time is None or response_time < fastest_response_time:
             fastest_response_time = response_time
+
+        if slowest_response_time is None or response_time > slowest_response_time:
+            slowest_response_time = response_time
 
     failed_tests = total_tests - passed_tests
 
@@ -58,7 +62,12 @@ def show_statistics(rows):
     print("Failed:", failed_tests)
     print("Pass Rate:", pass_rate, "%")
     print("Average Response Time:", average_response_time, "ms")
-    print("Fastest Response Time:", fastest_response_time, "ms")
+
+    if total_tests == 0:
+        print("No response time data available")
+    else:
+        print("Fastest Response Time:", fastest_response_time, "ms")
+        print("Slowest Response Time:", slowest_response_time, "ms")
 
 def show_history(history_file):
     while True:
