@@ -28,6 +28,9 @@ def print_history_row(row):
           "Response Time:", row[4], "ms")
 
 def show_statistics(rows):
+    most_common_status = None
+    highest_status_count = 0
+    status_counts = {}
     total_tests = len(rows)
     passed_tests = 0
     total_response_time = 0
@@ -39,6 +42,7 @@ def show_statistics(rows):
     for row in rows:
         response_time = int(row[4])
         url = row[1]
+        status_code = row[3]
 
         if row[2] == "PASS":
             passed_tests += 1
@@ -52,6 +56,11 @@ def show_statistics(rows):
         if slowest_response_time is None or response_time > slowest_response_time:
             slowest_response_time = response_time
             slowest_url = url
+
+        if status_code in status_counts:
+            status_counts[status_code] += 1
+        else:
+            status_counts[status_code] = 1
 
     failed_tests = total_tests - passed_tests
 
@@ -77,6 +86,17 @@ def show_statistics(rows):
         print("Slowest Response Time:", slowest_response_time, "ms")
         print("Fastest URL:", fastest_url)
         print("Slowest URL:", slowest_url)
+    print("Status Code Counts:")
+
+    for status_code, count in status_counts.items():
+        print(status_code, ":", count)
+
+        if count > highest_status_count:
+            highest_status_count = count
+            most_common_status = status_code
+
+    print("Most Common Status Code:", most_common_status)
+    print("Occurrences:", highest_status_count)
 
 def show_history(history_file):
     while True:
