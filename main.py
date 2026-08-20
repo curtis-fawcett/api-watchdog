@@ -33,18 +33,25 @@ def show_statistics(rows):
     total_response_time = 0
     fastest_response_time = None
     slowest_response_time = None
+    fastest_url = None
+    slowest_url = None
 
     for row in rows:
         response_time = int(row[4])
+        url = row[1]
+
         if row[2] == "PASS":
             passed_tests += 1
+
         total_response_time += response_time
 
         if fastest_response_time is None or response_time < fastest_response_time:
             fastest_response_time = response_time
+            fastest_url = url
 
         if slowest_response_time is None or response_time > slowest_response_time:
             slowest_response_time = response_time
+            slowest_url = url
 
     failed_tests = total_tests - passed_tests
 
@@ -68,6 +75,8 @@ def show_statistics(rows):
     else:
         print("Fastest Response Time:", fastest_response_time, "ms")
         print("Slowest Response Time:", slowest_response_time, "ms")
+        print("Fastest URL:", fastest_url)
+        print("Slowest URL:", slowest_url)
 
 def show_history(history_file):
     while True:
