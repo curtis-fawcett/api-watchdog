@@ -62,8 +62,6 @@ def show_statistics(rows):
         average_response_time = round(total_response_time / total_tests, 1)
         slow_response_rate = round(slow_responses / total_tests * 100, 1)
 
-    print("API Statistics")
-    print()
     print("Total Tests:", total_tests)
     print("Passed:", passed_tests)
     print("Failed:", failed_tests)
