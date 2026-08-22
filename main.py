@@ -22,11 +22,13 @@ def show_settings():
                 print("Threshold must be greater than 0")
             else:
                 config.set_slow_response_threshold(new_threshold)
-                print("Slow response threshold updated to ", new_threshold, "ms")
+                print("Slow response threshold updated to", new_threshold, "ms")
         except ValueError:
             print("Threshold must be a whole number")
 
 def main():
+    config.load_settings()
+
     while True:
         print("API Watchdog")
         print()
