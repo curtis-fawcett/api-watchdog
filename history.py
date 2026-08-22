@@ -41,7 +41,8 @@ def show_history(history_file):
         print("2. Failed tests")
         print("3. Last 5 tests")
         print("4. Statistics")
-        print("5. Back to main menu")
+        print("5. Search by URL")
+        print("6. Back to main menu")
 
         history_choice = input("Choose an option: ").strip()
         rows = load_history(history_file)
@@ -82,6 +83,22 @@ def show_history(history_file):
             show_statistics(rows)
 
         elif history_choice == "5":
+            search_term = input("Enter URL keyword: ").strip()
+
+            if search_term == "":
+                print("Search cannot be empty")
+            else:
+                match_found = False
+
+                for row in rows:
+                    if search_term.lower() in row[1].lower():
+                        match_found = True
+                        print_history_row(row)
+
+                if not match_found:
+                    print("No matching URLs found")
+
+        elif history_choice == "6":
             return
 
         else:
