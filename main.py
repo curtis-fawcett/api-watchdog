@@ -5,6 +5,8 @@ from datetime import datetime
 
 history_file = "api_history.csv"
 
+slow_response_threshold = 500
+
 def load_history(history_file):
     rows = []
     file_exists = os.path.exists(history_file)
@@ -42,9 +44,14 @@ def show_statistics(rows):
     total_response_time = 0
     fastest_response_time = None
     slowest_response_time = None
+    slow_responses = 0
 
     for row in rows:
         response_time = int(row[4])
+
+        if response_time > slow_response_threshold:
+            slow_responses += 1
+
         url = row[1]
         status_code = row[3]
 
@@ -87,6 +94,7 @@ def show_statistics(rows):
     print("Failed:", failed_tests)
     print("Pass Rate:", pass_rate, "%")
     print("Average Response Time:", average_response_time, "ms")
+    print("Slow Responses", "(>", slow_response_threshold, "ms):", slow_responses)
 
     if total_tests == 0:
         print("No response time data available")
@@ -217,6 +225,9 @@ def print_test_result(test_result, status_code, response_time):
     print("Result:", test_result)
     print("Status Code:", status_code)
     print("Response Time:", response_time, "ms")
+
+    if response_time > slow_response_threshold:
+        print("Warning: Slow response")
 
 def run_api_test(history_file):
     url = input("Enter API URL: ").strip()
