@@ -1,5 +1,7 @@
 import csv
 import os
+
+from config import slow_response_threshold
 from statistics import show_statistics
 
 def load_history(history_file):
@@ -43,7 +45,8 @@ def show_history(history_file):
         print("4. Statistics")
         print("5. Search by URL")
         print("6. Search by Status Code")
-        print("7. Back to main menu")
+        print("7. Show Slow Responses")
+        print("8. Back to main menu")
 
         history_choice = input("Choose an option: ").strip()
         rows = load_history(history_file)
@@ -115,6 +118,18 @@ def show_history(history_file):
                     print("No matching Status Code found ")
 
         elif history_choice == "7":
+            response_time_filter = False
+
+            for row in rows:
+                response_time = int(row[4])
+
+                if response_time > slow_response_threshold:
+                    response_time_filter = True
+                    print_history_row(row)
+            if not response_time_filter:
+                print("No slow responses found")
+
+        elif history_choice == "8":
             return
 
         else:
