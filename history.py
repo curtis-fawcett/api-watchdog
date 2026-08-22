@@ -46,8 +46,9 @@ def show_history(history_file):
         print("5. Search by URL")
         print("6. Search by Status Code")
         print("7. Show Slow Responses")
-        print("8. Top 5 Slowest Tests")
-        print("9. Back to main menu")
+        print("8. Top 5 Fastest Tests")
+        print("9. Top 5 Slowest Tests")
+        print("10. Back to main menu")
 
         history_choice = input("Choose an option: ").strip()
         print()
@@ -153,6 +154,20 @@ def show_history(history_file):
                 print("No slow responses found")
 
         elif history_choice == "8":
+            print("Top 5 Fastest tests")
+            print()
+
+            if rows:
+                fastest_tests = rows.copy()
+                fastest_tests.sort(key=lambda row: int(row[4]), reverse=False)
+
+                for row in fastest_tests[:5]:
+                    print_history_row(row)
+            else:
+                print("No history found")
+
+
+        elif history_choice == "9":
             print("Top 5 Slowest tests")
             print()
 
@@ -165,7 +180,8 @@ def show_history(history_file):
             else:
                 print("No History found")
 
-        elif history_choice == "9":
+
+        elif history_choice == "10":
             return
 
         else:
