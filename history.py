@@ -42,7 +42,8 @@ def show_history(history_file):
         print("3. Last 5 tests")
         print("4. Statistics")
         print("5. Search by URL")
-        print("6. Back to main menu")
+        print("6. Search by Status Code")
+        print("7. Back to main menu")
 
         history_choice = input("Choose an option: ").strip()
         rows = load_history(history_file)
@@ -99,6 +100,21 @@ def show_history(history_file):
                     print("No matching URLs found")
 
         elif history_choice == "6":
+            search_code = input("Enter Status Code: ").strip()
+
+            if search_code == "":
+                print("Status code cannot be empty")
+            else:
+                code_match_found = False
+
+                for row in rows:
+                    if search_code == row[3]:
+                        code_match_found = True
+                        print_history_row(row)
+                if not code_match_found:
+                    print("No matching Status Code found ")
+
+        elif history_choice == "7":
             return
 
         else:
