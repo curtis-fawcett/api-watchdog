@@ -1,4 +1,4 @@
-from config import slow_response_threshold
+import config
 
 def show_statistics(rows):
     url_counts = {}
@@ -22,7 +22,7 @@ def show_statistics(rows):
     for row in rows:
         response_time = int(row[4])
 
-        if response_time > slow_response_threshold:
+        if response_time > config.slow_response_threshold:
             slow_responses += 1
 
         url = row[1]
@@ -67,7 +67,7 @@ def show_statistics(rows):
     print("Failed:", failed_tests)
     print("Pass Rate:", pass_rate, "%")
     print("Average Response Time:", average_response_time, "ms")
-    print("Slow Responses", "(>", slow_response_threshold, "ms):", slow_responses)
+    print("Slow Responses", "(>", config.slow_response_threshold, "ms):", slow_responses)
     print("Slow Response Rate:", slow_response_rate, "%")
 
     if total_tests == 0:

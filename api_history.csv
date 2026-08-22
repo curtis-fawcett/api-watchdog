@@ -44,3 +44,5 @@ Time,URL,Test Result,Status Code,Response Time
 2026-08-21 22:30:32,https://jsonplaceholder.typicode.com/users,PASS,200,188
 2026-08-21 22:32:09,https://jsonplaceholder.typicode.com/users,PASS,200,146
 2026-08-21 22:34:13,https://jsonplaceholder.typicode.com/users,PASS,200,138
+2026-08-22 15:47:53,https://jsonplaceholder.typicode.com/users,PASS,200,181
+2026-08-22 15:48:11,https://jsonplaceholder.typicode.com/users,PASS,200,227

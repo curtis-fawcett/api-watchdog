@@ -1,7 +1,7 @@
 import csv
 import os
+import config
 
-from config import slow_response_threshold
 from statistics import show_statistics
 
 def load_history(history_file):
@@ -147,7 +147,7 @@ def show_history(history_file):
             for row in rows:
                 response_time = int(row[4])
 
-                if response_time > slow_response_threshold:
+                if response_time > config.slow_response_threshold:
                     response_time_filter = True
                     print_history_row(row)
             if not response_time_filter:

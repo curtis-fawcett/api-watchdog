@@ -1,6 +1,7 @@
 import requests
+import config
+
 from datetime import datetime
-from config import slow_response_threshold
 from history import save_result
 
 def test_api(url):
@@ -37,7 +38,7 @@ def print_test_result(test_result, status_code, response_time):
     print("Status Code:", status_code)
     print("Response Time:", response_time, "ms")
 
-    if response_time > slow_response_threshold:
+    if response_time > config.slow_response_threshold:
         print("Warning: Slow response")
 
 def run_api_test(history_file):

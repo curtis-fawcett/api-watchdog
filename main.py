@@ -1,7 +1,30 @@
+import config
+
 from history import show_history
 from api_tester import run_api_test
 
 history_file = "api_history.csv"
+
+def show_settings():
+    print("Settings")
+    print()
+
+    print("Current slow response threshold:", config.slow_response_threshold, "ms")
+    settings_choice = input("Enter new threshold in ms: ")
+
+    if settings_choice == "":
+        print("Threshold cannot be empty")
+    else:
+        try:
+            new_threshold = int(settings_choice)
+
+            if new_threshold <= 0:
+                print("Threshold must be greater than 0")
+            else:
+                config.set_slow_response_threshold(new_threshold)
+                print("Slow response threshold updated to ", new_threshold, "ms")
+        except ValueError:
+            print("Threshold must be a whole number")
 
 def main():
     while True:
@@ -9,7 +32,8 @@ def main():
         print()
         print("1. Test an API")
         print("2. View test history")
-        print("3. Exit")
+        print("3. Settings")
+        print("4. Exit")
 
         choice = input("Choose an option: ").strip()
 
@@ -20,6 +44,9 @@ def main():
             show_history(history_file)
 
         elif choice == "3":
+            show_settings()
+
+        elif choice == "4":
             print("Goodbye!")
             break
 
