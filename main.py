@@ -83,9 +83,11 @@ def show_statistics(rows):
     if total_tests == 0:
         pass_rate = 0
         average_response_time = 0
+        slow_response_rate = 0
     else:
         pass_rate = round(passed_tests / total_tests * 100, 1)
         average_response_time = round(total_response_time / total_tests, 1)
+        slow_response_rate = round(slow_responses / total_tests * 100, 1)
 
     print("API Statistics")
     print()
@@ -95,6 +97,7 @@ def show_statistics(rows):
     print("Pass Rate:", pass_rate, "%")
     print("Average Response Time:", average_response_time, "ms")
     print("Slow Responses", "(>", slow_response_threshold, "ms):", slow_responses)
+    print("Slow Response Rate:", slow_response_rate, "%")
 
     if total_tests == 0:
         print("No response time data available")
