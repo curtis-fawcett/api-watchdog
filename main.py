@@ -3,8 +3,6 @@ import csv
 import os
 from datetime import datetime
 
-from Cython.Compiler.Parsing import p_assert_statement
-
 history_file = "api_history.csv"
 
 def load_history(history_file):
@@ -28,16 +26,22 @@ def print_history_row(row):
           "Response Time:", row[4], "ms")
 
 def show_statistics(rows):
+    url_counts = {}
+    fastest_url = None
+    slowest_url = None
+    most_tested_url = None
+    times_tested = 0
+
     most_common_status = None
     highest_status_count = 0
     status_counts = {}
+
     total_tests = len(rows)
     passed_tests = 0
+
     total_response_time = 0
     fastest_response_time = None
     slowest_response_time = None
-    fastest_url = None
-    slowest_url = None
 
     for row in rows:
         response_time = int(row[4])
@@ -61,6 +65,11 @@ def show_statistics(rows):
             status_counts[status_code] += 1
         else:
             status_counts[status_code] = 1
+
+        if url in url_counts:
+            url_counts[url] += 1
+        else:
+            url_counts[url] = 1
 
     failed_tests = total_tests - passed_tests
 
@@ -97,6 +106,18 @@ def show_statistics(rows):
 
     print("Most Common Status Code:", most_common_status)
     print("Occurrences:", highest_status_count)
+
+    print("URL Test Counts:")
+
+    for url, count in url_counts.items():
+        print(url, ":", count)
+
+        if count > times_tested:
+            most_tested_url = url
+            times_tested = count
+
+    print("Most Tested URL:", most_tested_url)
+    print("Times Tested:", times_tested)
 
 def show_history(history_file):
     while True:
