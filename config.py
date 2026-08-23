@@ -27,3 +27,5 @@ def load_settings():
 
     except json.JSONDecodeError:
         print("Warning: Could not load settings. Using default settings.")
+    except KeyError:
+        print("Warning: Slow response threshold missing. Using default setting.")
