@@ -19,8 +19,11 @@ def load_settings():
 
     if not os.path.exists(settings_file):
         return
+    try:
+        with open(settings_file, "r") as file:
+            settings = json.load(file)
+            saved_threshold = settings["slow_response_threshold"]
+            slow_response_threshold = saved_threshold
 
-    with open(settings_file, "r") as file:
-        settings = json.load(file)
-        saved_threshold = settings["slow_response_threshold"]
-        slow_response_threshold = saved_threshold
+    except json.JSONDecodeError:
+        print("Warning: Could not load settings. Using default settings.")
