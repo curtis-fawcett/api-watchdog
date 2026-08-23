@@ -9,7 +9,7 @@ def set_slow_response_threshold(new_threshold):
 
     slow_response_threshold = new_threshold
 
-    settings ={"slow_response_threshold": new_threshold}
+    settings = {"slow_response_threshold": new_threshold}
 
     with open(settings_file, "w") as file:
         json.dump(settings, file)
@@ -23,7 +23,10 @@ def load_settings():
         with open(settings_file, "r") as file:
             settings = json.load(file)
             saved_threshold = settings["slow_response_threshold"]
-            slow_response_threshold = saved_threshold
+            if isinstance(saved_threshold, int) and saved_threshold > 0:
+                slow_response_threshold = saved_threshold
+            else:
+                print("Warning: Invalid slow response threshold. Using default setting.")
 
     except json.JSONDecodeError:
         print("Warning: Could not load settings. Using default settings.")
