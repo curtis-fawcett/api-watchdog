@@ -48,7 +48,8 @@ def show_history(history_file):
         print("7. Show Slow Responses")
         print("8. Top 5 Fastest Tests")
         print("9. Top 5 Slowest Tests")
-        print("10. Back to main menu")
+        print("10. Clear Test History")
+        print("11. Back to main menu")
 
         history_choice = input("Choose an option: ").strip()
         print()
@@ -166,7 +167,6 @@ def show_history(history_file):
             else:
                 print("No history found")
 
-
         elif history_choice == "9":
             print("Top 5 Slowest tests")
             print()
@@ -180,8 +180,25 @@ def show_history(history_file):
             else:
                 print("No History found")
 
-
         elif history_choice == "10":
+            while True:
+                user_input = input("Are you sure you want to clear all test history? (yes/no): ").strip().lower()
+
+                if user_input == "yes":
+                    with open(history_file, "w", newline="") as file:
+                        writer = csv.writer(file)
+
+                        writer.writerow(["Time", "URL", "Test Result", "Status Code", "Response Time"])
+                        print("History has been cleared")
+                        break
+
+                elif user_input == "no":
+                    break
+
+                else:
+                    print("Please enter yes or no")
+
+        elif history_choice == "11":
             return
 
         else:
