@@ -72,31 +72,32 @@ def show_statistics(rows):
 
     if total_tests == 0:
         print("No response time data available")
+        print("No status code data available")
+        print("No URL data available")
     else:
         print("Fastest Response Time:", fastest_response_time, "ms")
         print("Slowest Response Time:", slowest_response_time, "ms")
         print("Fastest URL:", fastest_url)
         print("Slowest URL:", slowest_url)
-    print("Status Code Counts:")
 
-    for status_code, count in status_counts.items():
-        print(status_code, ":", count)
+        print("Status Code Counts:")
+        for status_code, count in status_counts.items():
+            print(status_code, ":", count)
 
-        if count > highest_status_count:
-            highest_status_count = count
-            most_common_status = status_code
+            if count > highest_status_count:
+                highest_status_count = count
+                most_common_status = status_code
 
-    print("Most Common Status Code:", most_common_status)
-    print("Occurrences:", highest_status_count)
+        print("Most Common Status Code:", most_common_status)
+        print("Occurrences:", highest_status_count)
 
-    print("URL Test Counts:")
+        print("URL Test Counts:")
+        for url, count in url_counts.items():
+            print(url, ":", count)
 
-    for url, count in url_counts.items():
-        print(url, ":", count)
+            if count > times_tested:
+                most_tested_url = url
+                times_tested = count
 
-        if count > times_tested:
-            most_tested_url = url
-            times_tested = count
-
-    print("Most Tested URL:", most_tested_url)
-    print("Times Tested:", times_tested)
+        print("Most Tested URL:", most_tested_url)
+        print("Times Tested:", times_tested)
