@@ -41,15 +41,16 @@ def show_history(history_file):
         print()
         print("1. All tests")
         print("2. Failed tests")
-        print("3. Last 5 tests")
-        print("4. Statistics")
-        print("5. Search by URL")
-        print("6. Search by Status Code")
-        print("7. Show Slow Responses")
-        print("8. Top 5 Fastest Tests")
-        print("9. Top 5 Slowest Tests")
-        print("10. Clear Test History")
-        print("11. Back to main menu")
+        print("3. Passed tests")
+        print("4. Last 5 tests")
+        print("5. Statistics")
+        print("6. Search by URL")
+        print("7. Search by Status Code")
+        print("8. Show Slow Responses")
+        print("9. Top 5 Fastest Tests")
+        print("10. Top 5 Slowest Tests")
+        print("11. Clear Test History")
+        print("12. Back to main menu")
 
         history_choice = input("Choose an option: ").strip()
         print()
@@ -57,7 +58,6 @@ def show_history(history_file):
 
         if history_choice == "1":
             print("All tests")
-            print()
 
             if rows:
                 for row in rows:
@@ -67,7 +67,6 @@ def show_history(history_file):
 
         elif history_choice == "2":
             print("Failed tests")
-            print()
 
             if rows:
                 failed_found = False
@@ -81,8 +80,19 @@ def show_history(history_file):
                 print("No History found")
 
         elif history_choice == "3":
+            print("Passed tests")
+
+            if rows:
+                passed_found = False
+                for row in rows:
+                    if row[2] == "PASS":
+                        passed_found = True
+                        print_history_row(row)
+                if not passed_found:
+                    print("No passed tests found")
+
+        elif history_choice == "4":
             print("Last 5 tests")
-            print()
 
             if rows:
                 history_count = len(rows)
@@ -96,15 +106,13 @@ def show_history(history_file):
             else:
                 print("No History found")
 
-        elif history_choice == "4":
+        elif history_choice == "5":
             print("Statistics")
-            print()
 
             show_statistics(rows)
 
-        elif history_choice == "5":
+        elif history_choice == "6":
             print("URL Search")
-            print()
 
             search_term = input("Enter URL keyword: ").strip()
 
@@ -121,9 +129,8 @@ def show_history(history_file):
                 if not match_found:
                     print("No matching URLs found")
 
-        elif history_choice == "6":
+        elif history_choice == "7":
             print("Status Code Search")
-            print()
 
             search_code = input("Enter Status Code: ").strip()
 
@@ -139,9 +146,8 @@ def show_history(history_file):
                 if not code_match_found:
                     print("No matching Status Code found ")
 
-        elif history_choice == "7":
+        elif history_choice == "8":
             print("Slow Responses")
-            print()
 
             response_time_filter = False
 
@@ -154,7 +160,7 @@ def show_history(history_file):
             if not response_time_filter:
                 print("No slow responses found")
 
-        elif history_choice == "8":
+        elif history_choice == "9":
             print("Top 5 Fastest tests")
             print()
 
@@ -167,7 +173,7 @@ def show_history(history_file):
             else:
                 print("No history found")
 
-        elif history_choice == "9":
+        elif history_choice == "10":
             print("Top 5 Slowest tests")
             print()
 
@@ -180,7 +186,7 @@ def show_history(history_file):
             else:
                 print("No History found")
 
-        elif history_choice == "10":
+        elif history_choice == "11":
             while True:
                 user_input = input("Are you sure you want to clear all test history? (yes/no): ").strip().lower()
 
@@ -198,7 +204,7 @@ def show_history(history_file):
                 else:
                     print("Please enter yes or no")
 
-        elif history_choice == "11":
+        elif history_choice == "12":
             return
 
         else:
