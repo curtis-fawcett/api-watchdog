@@ -1,2 +1,4 @@
 Time,URL,Test Result,Status Code,Response Time
 2026-08-24 06:53:36,https://jsonplaceholder.typicode.com/users,PASS,200,171
+2026-08-25 21:21:41,https://jsonplaceholder.typicode.com/not-a-real-page,FAIL,404,225
+2026-08-25 21:25:03,https://jsonplaceholder.typicode.com/not-a-real-page,FAIL,404,164

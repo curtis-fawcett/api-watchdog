@@ -50,7 +50,8 @@ def show_history(history_file):
         print("9. Top 5 Fastest Tests")
         print("10. Top 5 Slowest Tests")
         print("11. Clear Test History")
-        print("12. Back to main menu")
+        print("12. Last Failed Test")
+        print("13. Back to main menu")
 
         history_choice = input("Choose an option: ").strip()
         print()
@@ -162,7 +163,6 @@ def show_history(history_file):
 
         elif history_choice == "9":
             print("Top 5 Fastest tests")
-            print()
 
             if rows:
                 fastest_tests = rows.copy()
@@ -175,7 +175,6 @@ def show_history(history_file):
 
         elif history_choice == "10":
             print("Top 5 Slowest tests")
-            print()
 
             if rows:
                 slowest_tests = rows.copy()
@@ -205,6 +204,21 @@ def show_history(history_file):
                     print("Please enter yes or no")
 
         elif history_choice == "12":
+            print("Last Failed Test")
+
+            if rows:
+                failed_found = False
+                for row in reversed(rows):
+                    if row[2] == "FAIL":
+                        failed_found = True
+                        print_history_row(row)
+                        break
+                if not failed_found:
+                    print("No failed tests found")
+            else:
+                print("No History found")
+
+        elif history_choice == "13":
             return
 
         else:
