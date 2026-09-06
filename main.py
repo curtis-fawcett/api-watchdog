@@ -1,13 +1,15 @@
 import config
 
-from history import show_history
 from api_tester import run_api_test
+from history import show_history
 from profiles import profiles_menu
 from settings import show_settings
 
-history_file = "api_history.csv"
+HISTORY_FILE = "api_history.csv"
+
 
 def main():
+    """Run the API Watchdog main menu."""
     config.load_settings()
 
     while True:
@@ -15,17 +17,17 @@ def main():
         print()
         print("1. Test an API")
         print("2. View test history")
-        print("3. API Profiles")
+        print("3. API profiles")
         print("4. Settings")
         print("5. Exit")
 
         choice = input("Choose an option: ").strip()
 
         if choice == "1":
-            run_api_test(history_file)
+            run_api_test(HISTORY_FILE)
 
         elif choice == "2":
-            show_history(history_file)
+            show_history(HISTORY_FILE)
 
         elif choice == "3":
             profiles_menu()
@@ -35,10 +37,11 @@ def main():
 
         elif choice == "5":
             print("Goodbye!")
-            break
+            return
 
         else:
-            print("Please choose an option from the menu")
+            print("Please choose an option from the menu.")
+
 
 if __name__ == "__main__":
     main()

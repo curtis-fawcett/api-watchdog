@@ -2,14 +2,15 @@ import json
 
 FILENAME = "profiles.json"
 
-def profiles_menu():
-    while True:
-        print("API Profiles")
-        print()
 
-        print("1. View Profiles")
-        print("2. Add Profile")
-        print("3. Delete Profile")
+def profiles_menu():
+    """Display the API profiles menu and handle profile actions."""
+    while True:
+        print("API profiles")
+        print()
+        print("1. View profiles")
+        print("2. Add profile")
+        print("3. Delete profile")
         print("4. Back")
 
         profile_choice = input("Choose an option: ").strip()
@@ -18,15 +19,19 @@ def profiles_menu():
             profiles_data = load_profiles()
 
             if not profiles_data:
-                print("No profiles found. Please create a profile first")
+                print("No profiles found. Please create a profile first.")
             else:
-                for number, (profile_name, api_url) in enumerate(profiles_data.items(), start=1):
-                    print(f"{number}. {profile_name}: {api_url}")
+                for number, (profile_name, api_url) in enumerate(
+                    profiles_data.items(), start=1
+                ):
+                    print(f"{number}. {profile_name} - {api_url}")
 
         elif profile_choice == "2":
             profiles_data = load_profiles()
+
             try:
-                profile_name = input("Enter Profile name: ").strip()
+                profile_name = input("Enter profile name: ").strip()
+
                 if not profile_name:
                     print("Profile name cannot be empty.")
                     continue
@@ -43,56 +48,65 @@ def profiles_menu():
 
                 profiles_data[profile_name] = api_url
 
-                with open(FILENAME, "w") as file:
+                with open(FILENAME, "w", encoding="utf-8") as file:
                     json.dump(profiles_data, file, indent=4)
-                print(f"Profile '{profile_name}' added successfully!")
+
+                print(f"Profile '{profile_name}' added successfully.")
                 print()
 
-            except OSError as e:
-                print(f"An error occurred while saving: {e}")
+            except OSError as error:
+                print(f"An error occurred while saving: {error}")
 
         elif profile_choice == "3":
             profiles_data = load_profiles()
 
             if not profiles_data:
-                print('No profiles found.')
-            else:
-                for number, (profile_name, api_url) in enumerate(profiles_data.items(), start=1):
-                    print(f"{number}. {profile_name}")
+                print("No profiles found.")
+                continue
 
-                delete_choice = input("Enter profile number to delete: ")
+            profile_names = list(profiles_data.keys())
 
-                try:
-                    delete_number = int(delete_choice)
+            for number, profile_name in enumerate(profile_names, start=1):
+                print(f"{number}. {profile_name}")
 
-                    if delete_number < 1 or delete_number > len(profiles_data):
-                        print("Invalid profile number.")
-                    else:
-                        profile_name = list(profiles_data.keys())[delete_number - 1]
+            delete_choice = input("Enter profile number to delete: ").strip()
 
-                        del profiles_data[profile_name]
+            try:
+                delete_number = int(delete_choice)
 
-                        with open(FILENAME, "w") as file:
-                            json.dump(profiles_data, file, indent=4)
+                if delete_number < 1 or delete_number > len(profile_names):
+                    print("Invalid profile number.")
+                    continue
 
-                        print(f"Profile '{profile_name}' deleted successfully.")
-                        print()
+                profile_name = profile_names[delete_number - 1]
+                del profiles_data[profile_name]
 
-                except ValueError:
-                    print("Please enter a valid number.")
+                with open(FILENAME, "w", encoding="utf-8") as file:
+                    json.dump(profiles_data, file, indent=4)
+
+                print(f"Profile '{profile_name}' deleted successfully.")
+                print()
+
+            except ValueError:
+                print("Please enter a valid profile number.")
 
         elif profile_choice == "4":
             return
 
         else:
-            print("Please choose an option from the menu")
+            print("Please choose an option from the profiles menu.")
+
 
 def load_profiles():
+    """Load saved API profiles from the JSON file."""
     try:
-        with open(FILENAME, "r") as file:
+        with open(FILENAME, "r", encoding="utf-8") as file:
             data = json.load(file)
+
             if isinstance(data, dict):
                 return data
+
             return {}
+
     except (FileNotFoundError, json.JSONDecodeError):
         return {}

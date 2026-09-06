@@ -1,22 +1,35 @@
 import config
 
+
 def show_settings():
+    """Display and update the slow response threshold."""
     print("Settings")
     print()
+    print(
+        "Current slow response threshold:",
+        config.slow_response_threshold,
+        "ms"
+    )
 
-    print("Current slow response threshold:", config.slow_response_threshold, "ms")
-    settings_choice = input("Enter new threshold in ms: ")
+    settings_choice = input("Enter new threshold in ms: ").strip()
 
-    if settings_choice == "":
-        print("Threshold cannot be empty")
-    else:
-        try:
-            new_threshold = int(settings_choice)
+    if not settings_choice:
+        print("Threshold cannot be empty.")
+        return
 
-            if new_threshold <= 0:
-                print("Threshold must be greater than 0")
-            else:
-                config.set_slow_response_threshold(new_threshold)
-                print("Slow response threshold updated to", new_threshold, "ms")
-        except ValueError:
-            print("Threshold must be a whole number")
+    try:
+        new_threshold = int(settings_choice)
+
+        if new_threshold <= 0:
+            print("Threshold must be greater than 0.")
+            return
+
+        config.set_slow_response_threshold(new_threshold)
+        print(
+            "Slow response threshold updated to",
+            new_threshold,
+            "ms"
+        )
+
+    except ValueError:
+        print("Threshold must be a whole number.")
