@@ -1,7 +1,11 @@
 import unittest
 
-from api_tester import test_api
+import config
 
+from api_tester import test_api
+from profiles import load_profiles
+from history import load_history, save_result
+from statistics import show_statistics
 
 class TestApiWatchdog(unittest.TestCase):
     def test_api_success(self):
@@ -12,3 +16,173 @@ class TestApiWatchdog(unittest.TestCase):
         self.assertEqual(result, "PASS")
         self.assertEqual(status_code, 200)
         self.assertIsNotNone(response_time)
+
+    def test_api_invalid_url(self):
+        result, status_code, response_time = test_api(
+            "not-a-valid-url"
+        )
+
+        self.assertIsNone(result)
+        self.assertIsNone(status_code)
+        self.assertIsNone(response_time)
+
+    def test_api_empty_url(self):
+        result, status_code, response_time = test_api("")
+
+        self.assertIsNone(result)
+        self.assertIsNone(status_code)
+        self.assertIsNone(response_time)
+
+    def test_api_not_found(self):
+        result, status_code, response_time = test_api(
+            "https://jsonplaceholder.typicode.com/invalid-endpoint"
+        )
+
+        self.assertEqual(result, "FAIL")
+        self.assertEqual(status_code, 404)
+        self.assertIsNotNone(response_time)
+
+    def test_api_server_error(self):
+        result, status_code, response_time = test_api(
+            "https://httpbin.org/status/500"
+        )
+
+        self.assertEqual(result, "FAIL")
+        self.assertEqual(status_code, 500)
+        self.assertIsNotNone(response_time)
+
+    def test_load_profiles(self):
+        profiles = load_profiles()
+
+        self.assertIsInstance(profiles, dict)
+        self.assertIn("JSONPlaceholder Users", profiles)
+        self.assertIn("JSONPlaceholder Posts", profiles)
+
+    def test_save_result(self):
+        import os
+        import tempfile
+
+        history_file = os.path.join(
+            tempfile.gettempdir(),
+            "test_api_history.csv"
+        )
+
+        if os.path.exists(history_file):
+            os.remove(history_file)
+
+        save_result(
+            history_file,
+            "2026-09-06 19:00:00",
+            "https://example.com",
+            "PASS",
+            200,
+            100
+        )
+
+        rows = load_history(history_file)
+
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0][1], "https://example.com")
+        self.assertEqual(rows[0][2], "PASS")
+        self.assertEqual(rows[0][3], "200")
+        self.assertEqual(rows[0][4], "100")
+
+        os.remove(history_file)
+
+    def test_load_empty_history(self):
+        import os
+        import tempfile
+
+        history_file = os.path.join(
+            tempfile.gettempdir(),
+            "empty_api_history.csv"
+        )
+
+        if os.path.exists(history_file):
+            os.remove(history_file)
+
+        rows = load_history(history_file)
+
+        self.assertEqual(rows, [])
+
+    def test_empty_statistics(self):
+        rows = []
+
+        show_statistics(rows)
+
+        self.assertEqual(len(rows), 0)
+
+    def test_statistics_with_data(self):
+        rows = [
+            [
+                "2026-09-06 19:00:00",
+                "https://example.com",
+                "PASS",
+                "200",
+                "100"
+            ],
+            [
+                "2026-09-06 19:01:00",
+                "https://example.com",
+                "FAIL",
+                "500",
+                "300"
+            ]
+        ]
+
+        show_statistics(rows)
+
+        self.assertEqual(len(rows), 2)
+
+    def test_profile_urls(self):
+        profiles = load_profiles()
+
+        self.assertEqual(
+            profiles["JSONPlaceholder Users"],
+            "https://jsonplaceholder.typicode.com/users"
+        )
+
+        self.assertEqual(
+            profiles["JSONPlaceholder Posts"],
+            "https://jsonplaceholder.typicode.com/posts"
+        )
+
+    def test_set_slow_response_threshold(self):
+        original_threshold = config.slow_response_threshold
+
+        config.set_slow_response_threshold(300)
+
+        self.assertEqual(config.slow_response_threshold, 300)
+
+        config.set_slow_response_threshold(original_threshold)
+
+    def test_load_settings(self):
+        config.set_slow_response_threshold(300)
+
+        config.slow_response_threshold = 500
+
+        config.load_settings()
+
+        self.assertEqual(config.slow_response_threshold, 300)
+
+    def test_slow_response_threshold(self):
+        original_threshold = config.slow_response_threshold
+
+        config.set_slow_response_threshold(200)
+
+        rows = [
+            [
+                "2026-09-06 19:00:00",
+                "https://example.com",
+                "PASS",
+                "200",
+                "300"
+            ]
+        ]
+
+        self.assertGreater(
+            int(rows[0][4]),
+            config.slow_response_threshold
+        )
+
+        config.set_slow_response_threshold(original_threshold)
