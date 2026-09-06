@@ -89,7 +89,8 @@ def show_history(history_file):
         print("10. Top 5 Slowest Tests")
         print("11. Clear Test History")
         print("12. Last Failed Test")
-        print("13. Back to main menu")
+        print("13. Show Invalid Responses")
+        print("14. Back to main menu")
 
         history_choice = input("Choose an option: ").strip()
         rows = load_history(history_file)
@@ -233,6 +234,19 @@ def show_history(history_file):
                 print("No history found")
 
         elif history_choice == "13":
+            print("Invalid Responses")
+
+            invalid_response_found = False
+
+            for row in rows:
+                if len(row) > 5 and row[5] == "FAIL":
+                    invalid_response_found = True
+                    print_history_row(row)
+
+            if not invalid_response_found:
+                print("No invalid responses found")
+
+        elif history_choice == "14":
             return
 
         else:

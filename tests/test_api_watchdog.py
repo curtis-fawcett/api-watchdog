@@ -228,3 +228,31 @@ class TestApiWatchdog(unittest.TestCase):
         self.assertEqual(len(rows), 2)
 
         os.remove(history_file)
+
+    def test_invalid_response_filter(self):
+        rows = [
+            [
+                "2026-09-06 17:33:33",
+                "https://example.com",
+                "FAIL",
+                "200",
+                "111",
+                "FAIL"
+            ],
+            [
+                "2026-09-06 17:26:53",
+                "https://jsonplaceholder.typicode.com/users",
+                "PASS",
+                "200",
+                "112",
+                "PASS"
+            ]
+        ]
+
+        invalid_rows = [
+            row for row in rows
+            if len(row) > 5 and row[5] == "FAIL"
+        ]
+
+        self.assertEqual(len(invalid_rows), 1)
+        self.assertEqual(invalid_rows[0][1], "https://example.com")
