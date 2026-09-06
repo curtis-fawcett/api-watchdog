@@ -7,6 +7,7 @@ def show_statistics(rows):
     passed_tests = 0
     slow_responses = 0
     total_response_time = 0
+    invalid_responses = 0
 
     fastest_response_time = None
     slowest_response_time = None
@@ -23,6 +24,9 @@ def show_statistics(rows):
 
         if row[2] == "PASS":
             passed_tests += 1
+
+        if len(row) > 5 and row[5] == "FAIL":
+            invalid_responses += 1
 
         total_response_time += response_time
 
@@ -54,6 +58,7 @@ def show_statistics(rows):
     print("Total Tests:", total_tests)
     print("Passed:", passed_tests)
     print("Failed:", failed_tests)
+    print("Invalid Responses:", invalid_responses)
     print("Pass Rate:", pass_rate, "%")
     print("Average Response Time:", average_response_time, "ms")
     print(

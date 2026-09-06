@@ -34,11 +34,27 @@ def test_api(url):
         print("Request failed")
         return None, None, None
 
-    result = "PASS" if 200 <= response.status_code < 300 else "FAIL"
-
     response_time = int(response.elapsed.total_seconds() * 1000)
 
-    return result, response.status_code, response_time
+    response_valid = validate_response(response)
+
+    result = (
+        "PASS"
+        if 200 <= response.status_code < 300 and response_valid
+        else "FAIL"
+    )
+
+    return result, response.status_code, response_time, response_valid
+
+
+def validate_response(response):
+    """Check whether an API response contains valid JSON."""
+    try:
+        response.json()
+    except ValueError:
+        return False
+
+    return True
 
 
 def test_all_profiles(history_file):
@@ -54,12 +70,12 @@ def test_all_profiles(history_file):
     failed_tests = 0
     total_response_time = 0
     successful_tests = 0
+    invalid_responses = 0
 
     for profile_name, api_url in profiles_data.items():
         total_tests += 1
 
-        # Run the API test
-        test_result, status_code, response_time = test_api(api_url)
+        test_result, status_code, response_time, response_valid = test_api(api_url)
 
         if response_time is not None:
             total_response_time += response_time
@@ -70,19 +86,27 @@ def test_all_profiles(history_file):
         else:
             failed_tests += 1
 
+        if not response_valid:
+            invalid_responses += 1
+
         if test_result is not None:
             save_test_result(
                 history_file,
                 api_url,
                 test_result,
                 status_code,
-                response_time
+                response_time,
+                response_valid
             )
 
         if test_result is None:
             print(f"{profile_name} ........ FAILED")
         else:
-            print(f"{profile_name} ........ {test_result} ({response_time} ms)")
+            print(
+                f"{profile_name} ........ {test_result} "
+                f"(Response Validation: {'PASS' if response_valid else 'FAIL'}, "
+                f"{response_time} ms)"
+            )
 
     # Calculate average response time
     average_response_time = (
@@ -96,10 +120,11 @@ def test_all_profiles(history_file):
     print(f"{passed_tests} Passed")
     print(f"{failed_tests} Failed")
     print(f"{successful_tests} Responses received")
+    print(f"{invalid_responses} Invalid Responses")
     print(f"Average Response Time: {round(average_response_time, 1)} ms")
 
 
-def print_test_result(test_result, status_code, response_time):
+def print_test_result(test_result, status_code, response_time, response_valid):
     """Display the results of a single API test."""
     if test_result is None:
         print("Test could not be completed")
@@ -108,20 +133,36 @@ def print_test_result(test_result, status_code, response_time):
     print("Result:", test_result)
     print("Status Code:", status_code)
     print("Response Time:", response_time, "ms")
+    print("Response Validation:", "PASS" if response_valid else "FAIL")
 
     if response_time > config.slow_response_threshold:
         print("Warning: Slow response")
 
 
-def save_test_result(history_file, url, test_result, status_code, response_time):
+def save_test_result(
+    history_file,
+    url,
+    test_result,
+    status_code,
+    response_time,
+    response_valid
+):
     """Save a completed API test result to the history file."""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    save_result(history_file, timestamp, url, test_result, status_code, response_time)
+    save_result(
+        history_file,
+        timestamp,
+        url,
+        test_result,
+        status_code,
+        response_time,
+        response_valid
+    )
 
 
 def run_single_test(history_file, url):
     """Run one API test, save the result, and display the outcome."""
-    test_result, status_code, response_time = test_api(url)
+    test_result, status_code, response_time, response_valid = test_api(url)
 
     if test_result is not None:
         save_test_result(
@@ -129,10 +170,16 @@ def run_single_test(history_file, url):
             url,
             test_result,
             status_code,
-            response_time
+            response_time,
+            response_valid
         )
 
-    print_test_result(test_result, status_code, response_time)
+    print_test_result(
+        test_result,
+        status_code,
+        response_time,
+        response_valid
+    )
 
 
 def run_api_test(history_file):

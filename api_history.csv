@@ -1,4 +1,4 @@
-Time,URL,Test Result,Status Code,Response Time
+Time,URL,Test Result,Status Code,Response Time,Response Validation
 2026-08-24 06:53:36,https://jsonplaceholder.typicode.com/users,PASS,200,171
 2026-08-25 21:21:41,https://jsonplaceholder.typicode.com/not-a-real-page,FAIL,404,225
 2026-08-25 21:25:03,https://jsonplaceholder.typicode.com/not-a-real-page,FAIL,404,164
@@ -41,3 +41,6 @@ Time,URL,Test Result,Status Code,Response Time
 2026-09-05 13:24:39,https://jsonplaceholder.typicode.com/posts,PASS,200,117
 2026-09-05 20:28:57,https://jsonplaceholder.typicode.com/users,PASS,200,242
 2026-09-05 20:41:31,https://jsonplaceholder.typicode.com/users,PASS,200,149
+2026-09-06 17:24:08,https://jsonplaceholder.typicode.com/users,PASS,200,131,True
+2026-09-06 17:26:53,https://jsonplaceholder.typicode.com/users,PASS,200,112,PASS
+2026-09-06 17:33:33,https://example.com,FAIL,200,111,FAIL

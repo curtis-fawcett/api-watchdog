@@ -2,14 +2,18 @@ import unittest
 
 import config
 
-from api_tester import test_api
+import requests
+
+from api_tester import test_api, validate_response, test_all_profiles
 from profiles import load_profiles
 from history import load_history, save_result
 from statistics import show_statistics
+from io import StringIO
+from unittest.mock import patch
 
 class TestApiWatchdog(unittest.TestCase):
     def test_api_success(self):
-        result, status_code, response_time = test_api(
+        result, status_code, response_time, response_valid = test_api(
             "https://jsonplaceholder.typicode.com/users"
         )
 
@@ -34,7 +38,7 @@ class TestApiWatchdog(unittest.TestCase):
         self.assertIsNone(response_time)
 
     def test_api_not_found(self):
-        result, status_code, response_time = test_api(
+        result, status_code, response_time, response_valid = test_api(
             "https://jsonplaceholder.typicode.com/invalid-endpoint"
         )
 
@@ -43,7 +47,7 @@ class TestApiWatchdog(unittest.TestCase):
         self.assertIsNotNone(response_time)
 
     def test_api_server_error(self):
-        result, status_code, response_time = test_api(
+        result, status_code, response_time, response_valid = test_api(
             "https://httpbin.org/status/500"
         )
 
@@ -76,7 +80,8 @@ class TestApiWatchdog(unittest.TestCase):
             "https://example.com",
             "PASS",
             200,
-            100
+            100,
+            True
         )
 
         rows = load_history(history_file)
@@ -119,20 +124,23 @@ class TestApiWatchdog(unittest.TestCase):
                 "https://example.com",
                 "PASS",
                 "200",
-                "100"
+                "100",
+                "PASS"
             ],
             [
                 "2026-09-06 19:01:00",
                 "https://example.com",
                 "FAIL",
                 "500",
-                "300"
+                "300",
+                "FAIL"
             ]
         ]
 
-        show_statistics(rows)
+        with patch("sys.stdout", new=StringIO()) as output:
+            show_statistics(rows)
 
-        self.assertEqual(len(rows), 2)
+        self.assertIn("Invalid Responses: 1", output.getvalue())
 
     def test_profile_urls(self):
         profiles = load_profiles()
@@ -186,3 +194,37 @@ class TestApiWatchdog(unittest.TestCase):
         )
 
         config.set_slow_response_threshold(original_threshold)
+
+    def test_validate_response(self):
+        response = requests.get(
+            "https://jsonplaceholder.typicode.com/users"
+        )
+
+        self.assertTrue(validate_response(response))
+
+    def test_validate_invalid_response(self):
+        response = requests.get(
+            "https://example.com"
+        )
+
+        self.assertFalse(validate_response(response))
+
+    def test_all_profiles(self):
+        import os
+        import tempfile
+
+        history_file = os.path.join(
+            tempfile.gettempdir(),
+            "test_all_profiles_history.csv"
+        )
+
+        if os.path.exists(history_file):
+            os.remove(history_file)
+
+        test_all_profiles(history_file)
+
+        rows = load_history(history_file)
+
+        self.assertEqual(len(rows), 2)
+
+        os.remove(history_file)

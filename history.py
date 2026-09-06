@@ -8,9 +8,8 @@ from statistics import show_statistics
 def load_history(history_file):
     """Load API test history from the CSV file."""
     rows = []
-    file_exists = os.path.exists(history_file)
 
-    if not file_exists:
+    if not os.path.exists(history_file):
         return rows
 
     with open(history_file, "r", newline="") as file:
@@ -26,16 +25,27 @@ def load_history(history_file):
 
 def print_history_row(row):
     """Display one API test history record."""
+    response_validation = row[5] if len(row) > 5 else "N/A"
+
     print(
         "Time:", row[0],
         "| URL:", row[1],
         "| Result:", row[2],
         "| Status:", row[3],
-        "| Response Time:", row[4], "ms"
+        "| Response Time:", row[4], "ms",
+        "| Response Validation:", response_validation
     )
 
 
-def save_result(history_file, timestamp, url, test_result, status_code, response_time):
+def save_result(
+    history_file,
+    timestamp,
+    url,
+    test_result,
+    status_code,
+    response_time,
+    response_valid
+):
     """Save an API test result to the CSV history file."""
     file_exists = os.path.exists(history_file)
 
@@ -43,9 +53,23 @@ def save_result(history_file, timestamp, url, test_result, status_code, response
         writer = csv.writer(file)
 
         if not file_exists:
-            writer.writerow(["Time", "URL", "Test Result", "Status Code", "Response Time"])
+            writer.writerow([
+                "Time",
+                "URL",
+                "Test Result",
+                "Status Code",
+                "Response Time",
+                "Response Validation"
+            ])
 
-        writer.writerow([timestamp, url, test_result, status_code, response_time])
+        writer.writerow([
+            timestamp,
+            url,
+            test_result,
+            status_code,
+            response_time,
+            "PASS" if response_valid else "FAIL"
+        ])
 
 
 def show_history(history_file):
