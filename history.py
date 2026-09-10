@@ -26,14 +26,18 @@ def load_history(history_file):
 def print_history_row(row):
     """Display one API test history record."""
     response_validation = row[5] if len(row) > 5 else "N/A"
+    json_field = row[6] if len(row) > 6 else "N/A"
+    field_validation = row[7] if len(row) > 7 else "N/A"
 
     print(
-        "Time:", row[0],
-        "| URL:", row[1],
-        "| Result:", row[2],
-        "| Status:", row[3],
-        "| Response Time:", row[4], "ms",
-        "| Response Validation:", response_validation
+        f"Time: {row[0]} | "
+        f"URL: {row[1]} | "
+        f"Result: {row[2]} | "
+        f"Status: {row[3]} | "
+        f"Response Time: {row[4]} ms | "
+        f"Response Validation: {row[5]} | "
+        f"JSON Field: {row[6]} | "
+        f"Field Validation: {row[7]}"
     )
 
 
@@ -44,7 +48,9 @@ def save_result(
     test_result,
     status_code,
     response_time,
-    response_valid
+    response_valid,
+    field_name,
+    field_valid
 ):
     """Save an API test result to the CSV history file."""
     file_exists = os.path.exists(history_file)
@@ -59,7 +65,9 @@ def save_result(
                 "Test Result",
                 "Status Code",
                 "Response Time",
-                "Response Validation"
+                "Response Validation",
+                "JSON Field",
+                "Field Validation"
             ])
 
         writer.writerow([
@@ -68,9 +76,46 @@ def save_result(
             test_result,
             status_code,
             response_time,
-            "PASS" if response_valid else "FAIL"
+            "PASS" if response_valid else "FAIL",
+            field_name,
+            "PASS" if field_valid else "FAIL"
         ])
 
+def search_by_json_field(rows):
+    """Display all tests that used a specified JSON field."""
+    field_name = input("Enter JSON field: ").strip()
+
+    matching_rows = [
+        row for row in rows
+        if len(row) > 6 and row[6] == field_name
+    ]
+
+    if not matching_rows:
+        print("No matching tests found.")
+        return
+
+    for row in matching_rows:
+        print_history_row(row)
+
+def search_by_field(rows):
+    """Display all tests with the specified field validation result."""
+    field_validation = input("Enter PASS or FAIL: ").strip().upper()
+
+    if field_validation not in ("PASS", "FAIL"):
+        print("Please enter PASS or FAIL.")
+        return
+
+    matching_rows = [
+        row for row in rows
+        if len(row) > 7 and row[7] == field_validation
+    ]
+
+    if not matching_rows:
+        print("No matching validation found.")
+        return
+
+    for row in matching_rows:
+        print_history_row(row)
 
 def show_history(history_file):
     """Display the API test history menu and handle selections."""
@@ -90,7 +135,9 @@ def show_history(history_file):
         print("11. Clear Test History")
         print("12. Last Failed Test")
         print("13. Show Invalid Responses")
-        print("14. Back to main menu")
+        print("14. Search by JSON Field")
+        print("15. Search by Field Validation")
+        print("16. Back to main menu")
 
         history_choice = input("Choose an option: ").strip()
         rows = load_history(history_file)
@@ -247,6 +294,12 @@ def show_history(history_file):
                 print("No invalid responses found")
 
         elif history_choice == "14":
+            search_by_json_field(rows)
+
+        elif history_choice == "15":
+            search_by_field(rows)
+
+        elif history_choice == "16":
             return
 
         else:

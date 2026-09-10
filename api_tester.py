@@ -7,7 +7,7 @@ from history import save_result
 from profiles import load_profiles
 
 
-def test_api(url):
+def test_api(url, field_name):
     """Test an API URL and return the result, status code, and response time."""
     url = url.strip()
 
@@ -38,13 +38,20 @@ def test_api(url):
 
     response_valid = validate_response(response)
 
+    if response_valid:
+        field_valid = check_json_field(response, field_name)
+    else:
+        field_valid = False
+
     result = (
         "PASS"
-        if 200 <= response.status_code < 300 and response_valid
+        if 200 <= response.status_code < 300
+           and response_valid
+           and field_valid
         else "FAIL"
     )
 
-    return result, response.status_code, response_time, response_valid
+    return result, response.status_code, response_time, response_valid, field_valid
 
 
 def validate_response(response):
@@ -75,7 +82,7 @@ def test_all_profiles(history_file):
     for profile_name, api_url in profiles_data.items():
         total_tests += 1
 
-        test_result, status_code, response_time, response_valid = test_api(api_url)
+        test_result, status_code, response_time, response_valid, field_valid = test_api(api_url, "")
 
         if response_time is not None:
             total_response_time += response_time
@@ -96,7 +103,9 @@ def test_all_profiles(history_file):
                 test_result,
                 status_code,
                 response_time,
-                response_valid
+                response_valid,
+                "",
+                True
             )
 
         if test_result is None:
@@ -124,7 +133,13 @@ def test_all_profiles(history_file):
     print(f"Average Response Time: {round(average_response_time, 1)} ms")
 
 
-def print_test_result(test_result, status_code, response_time, response_valid):
+def print_test_result(
+    test_result,
+    status_code,
+    response_time,
+    response_valid,
+    field_valid
+):
     """Display the results of a single API test."""
     if test_result is None:
         print("Test could not be completed")
@@ -134,6 +149,7 @@ def print_test_result(test_result, status_code, response_time, response_valid):
     print("Status Code:", status_code)
     print("Response Time:", response_time, "ms")
     print("Response Validation:", "PASS" if response_valid else "FAIL")
+    print("Field Validation:", "PASS" if field_valid else "FAIL")
 
     if response_time > config.slow_response_threshold:
         print("Warning: Slow response")
@@ -145,7 +161,9 @@ def save_test_result(
     test_result,
     status_code,
     response_time,
-    response_valid
+    response_valid,
+    field_name,
+    field_valid
 ):
     """Save a completed API test result to the history file."""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -156,13 +174,15 @@ def save_test_result(
         test_result,
         status_code,
         response_time,
-        response_valid
+        response_valid,
+        field_name,
+        field_valid
     )
 
 
-def run_single_test(history_file, url):
+def run_single_test(history_file, url, field_name):
     """Run one API test, save the result, and display the outcome."""
-    test_result, status_code, response_time, response_valid = test_api(url)
+    test_result, status_code, response_time, response_valid, field_valid = test_api(url, field_name)
 
     if test_result is not None:
         save_test_result(
@@ -171,14 +191,17 @@ def run_single_test(history_file, url):
             test_result,
             status_code,
             response_time,
-            response_valid
+            response_valid,
+            field_name,
+            field_valid
         )
 
     print_test_result(
         test_result,
         status_code,
         response_time,
-        response_valid
+        response_valid,
+        field_valid
     )
 
 
@@ -233,4 +256,25 @@ def run_api_test(history_file):
         print("Invalid option.")
         return
 
-    run_single_test(history_file, url)
+    field_name = input(
+        "Enter JSON field to verify (optional): "
+    ).strip()
+
+    run_single_test(history_file, url, field_name)
+
+
+def check_json_field(response, field_name):
+    if not field_name:
+        return True
+
+    json_data = response.json()
+
+    if isinstance(json_data, list):
+        if not json_data:
+            return False
+        return all(isinstance(user, dict) and field_name in user for user in json_data)
+
+    if isinstance(json_data, dict):
+        return field_name in json_data
+
+    return False

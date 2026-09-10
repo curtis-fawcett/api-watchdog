@@ -4,7 +4,7 @@ import config
 
 import requests
 
-from api_tester import test_api, validate_response, test_all_profiles
+from api_tester import test_api, validate_response, test_all_profiles, check_json_field
 from profiles import load_profiles
 from history import load_history, save_result
 from statistics import show_statistics
@@ -13,8 +13,8 @@ from unittest.mock import patch
 
 class TestApiWatchdog(unittest.TestCase):
     def test_api_success(self):
-        result, status_code, response_time, response_valid = test_api(
-            "https://jsonplaceholder.typicode.com/users"
+        result, status_code, response_time, response_valid, field_valid = test_api(
+            "https://jsonplaceholder.typicode.com/users", ""
         )
 
         self.assertEqual(result, "PASS")
@@ -23,7 +23,7 @@ class TestApiWatchdog(unittest.TestCase):
 
     def test_api_invalid_url(self):
         result, status_code, response_time = test_api(
-            "not-a-valid-url"
+            "not-a-valid-url", ""
         )
 
         self.assertIsNone(result)
@@ -31,15 +31,15 @@ class TestApiWatchdog(unittest.TestCase):
         self.assertIsNone(response_time)
 
     def test_api_empty_url(self):
-        result, status_code, response_time = test_api("")
+        result, status_code, response_time = test_api("", "")
 
         self.assertIsNone(result)
         self.assertIsNone(status_code)
         self.assertIsNone(response_time)
 
     def test_api_not_found(self):
-        result, status_code, response_time, response_valid = test_api(
-            "https://jsonplaceholder.typicode.com/invalid-endpoint"
+        result, status_code, response_time, response_valid, field_valid = test_api(
+            "https://jsonplaceholder.typicode.com/invalid-endpoint", ""
         )
 
         self.assertEqual(result, "FAIL")
@@ -47,8 +47,8 @@ class TestApiWatchdog(unittest.TestCase):
         self.assertIsNotNone(response_time)
 
     def test_api_server_error(self):
-        result, status_code, response_time, response_valid = test_api(
-            "https://httpbin.org/status/500"
+        result, status_code, response_time, response_valid, field_valid = test_api(
+            "https://httpbin.org/status/500", ""
         )
 
         self.assertEqual(result, "FAIL")
@@ -81,6 +81,8 @@ class TestApiWatchdog(unittest.TestCase):
             "PASS",
             200,
             100,
+            True,
+            "",
             True
         )
 
@@ -208,6 +210,78 @@ class TestApiWatchdog(unittest.TestCase):
         )
 
         self.assertFalse(validate_response(response))
+
+    def test_check_json_field_list_valid(self):
+        response = unittest.mock.Mock()
+        response.json.return_value = [
+            {"id": 1, "name": "John"},
+            {"id": 2, "name": "Jane"}
+        ]
+
+        self.assertTrue(check_json_field(response, "id"))
+
+    def test_check_json_field_list_missing(self):
+        response = unittest.mock.Mock()
+        response.json.return_value = [
+            {"id": 1, "name": "John"},
+            {"name": "Jane"}
+        ]
+
+        self.assertFalse(check_json_field(response, "id"))
+
+    def test_check_json_field_empty_list(self):
+        response = unittest.mock.Mock()
+        response.json.return_value = []
+
+        self.assertFalse(check_json_field(response, "id"))
+
+    def test_check_json_field_dict_valid(self):
+        response = unittest.mock.Mock()
+        response.json.return_value = {
+            "id": 1,
+            "name": "John"
+        }
+
+        self.assertTrue(check_json_field(response, "id"))
+
+    def test_check_json_field_dict_missing(self):
+        response = unittest.mock.Mock()
+        response.json.return_value = {
+            "name": "John"
+        }
+
+        self.assertFalse(check_json_field(response, "id"))
+
+    def test_check_json_field_unexpected_type(self):
+        response = unittest.mock.Mock()
+        response.json.return_value = "not a dictionary or list"
+
+        self.assertFalse(check_json_field(response, "id"))
+
+    def test_check_json_field_empty_field(self):
+        response = unittest.mock.Mock()
+
+        self.assertTrue(check_json_field(response, ""))
+
+    def test_api_field_valid(self):
+        result, status_code, response_time, response_valid, field_valid = test_api(
+            "https://jsonplaceholder.typicode.com/users",
+            "id"
+        )
+
+        self.assertEqual(result, "PASS")
+        self.assertTrue(response_valid)
+        self.assertTrue(field_valid)
+
+    def test_api_field_invalid(self):
+        result, status_code, response_time, response_valid, field_valid = test_api(
+            "https://jsonplaceholder.typicode.com/users",
+            "foobar"
+        )
+
+        self.assertEqual(result, "FAIL")
+        self.assertTrue(response_valid)
+        self.assertFalse(field_valid)
 
     def test_all_profiles(self):
         import os
