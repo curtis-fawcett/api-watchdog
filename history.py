@@ -30,14 +30,14 @@ def print_history_row(row):
     field_validation = row[7] if len(row) > 7 else "N/A"
 
     print(
-        f"Time: {row[0]} | "
+        f"Date & Time: {row[0]} | "
         f"URL: {row[1]} | "
         f"Result: {row[2]} | "
         f"Status: {row[3]} | "
         f"Response Time: {row[4]} ms | "
-        f"Response Validation: {row[5]} | "
-        f"JSON Field: {row[6]} | "
-        f"Field Validation: {row[7]}"
+        f"Response Validation: {response_validation} | "
+        f"JSON Field: {json_field} | "
+        f"Field Validation: {field_validation}"
     )
 
 
@@ -60,7 +60,7 @@ def save_result(
 
         if not file_exists:
             writer.writerow([
-                "Time",
+                "Date & Time",
                 "URL",
                 "Test Result",
                 "Status Code",
@@ -82,7 +82,8 @@ def save_result(
         ])
 
 def search_by_json_field(rows):
-    """Display all tests that used a specified JSON field."""
+    print("Search by JSON Field")
+
     field_name = input("Enter JSON field: ").strip()
 
     matching_rows = [
@@ -98,7 +99,8 @@ def search_by_json_field(rows):
         print_history_row(row)
 
 def search_by_field(rows):
-    """Display all tests with the specified field validation result."""
+    print("Search by Field Validation")
+
     field_validation = input("Enter PASS or FAIL: ").strip().upper()
 
     if field_validation not in ("PASS", "FAIL"):
@@ -117,6 +119,215 @@ def search_by_field(rows):
     for row in matching_rows:
         print_history_row(row)
 
+def search_by_date(rows):
+    print("Search by Date")
+
+    search_date = input("Enter a date: ").strip()
+
+    found_date = False
+
+    for row in rows:
+        if row and row[0].split()[0] == search_date:
+            print_history_row(row)
+            found_date = True
+
+    if not found_date:
+        print("No records found for that date.")
+
+def show_all_tests(rows):
+    """Display all API test history."""
+    print("All tests")
+
+    if rows:
+        for row in rows:
+            print_history_row(row)
+    else:
+        print("No history found")
+
+def show_failed_tests(rows):
+    print("Failed tests")
+
+    if rows:
+        failed_found = False
+
+        for row in rows:
+            if row[2] != "PASS":
+                failed_found = True
+                print_history_row(row)
+
+        if not failed_found:
+            print("No failed tests found")
+    else:
+        print("No history found")
+
+def show_passed_tests(rows):
+    print("Passed tests")
+
+    if rows:
+        passed_found = False
+
+        for row in rows:
+            if row[2] == "PASS":
+                passed_found = True
+                print_history_row(row)
+
+        if not passed_found:
+            print("No passed tests found")
+    else:
+        print("No history found")
+
+def last_5_tests(rows):
+    print("Last 5 tests")
+
+    if rows:
+        for row in rows[-5:]:
+            print_history_row(row)
+    else:
+        print("No history found")
+
+def search_by_url(rows):
+    print("Search by URL")
+
+    search_term = input("Enter URL keyword: ").strip()
+
+    if not search_term:
+        print("Search cannot be empty")
+    else:
+        match_found = False
+
+        for row in rows:
+            if search_term.lower() in row[1].lower():
+                match_found = True
+                print_history_row(row)
+
+        if not match_found:
+            print("No matching URLs found")
+
+def search_by_statuscode(rows):
+    print("Search by Status Code")
+
+    search_code = input("Enter Status Code: ").strip()
+
+    if not search_code:
+        print("Status code cannot be empty")
+    else:
+        code_match_found = False
+
+        for row in rows:
+            if search_code == row[3]:
+                code_match_found = True
+                print_history_row(row)
+
+        if not code_match_found:
+            print("No matching Status Code found")
+
+def show_slow_responses(rows):
+    print("Show Slow Responses")
+
+    slow_response_found = False
+
+    for row in rows:
+        response_time = int(row[4])
+
+        if response_time > config.slow_response_threshold:
+            slow_response_found = True
+            print_history_row(row)
+
+    if not slow_response_found:
+        print("No slow responses found")
+
+def show_fastest_test(rows):
+    print("Top 5 Fastest Tests")
+
+    if rows:
+        for row in sorted(rows, key=lambda row: int(row[4]))[:5]:
+            print_history_row(row)
+    else:
+        print("No history found")
+
+def show_slowest_test(rows):
+    print("Top 5 Slowest Tests")
+
+    if rows:
+        for row in sorted(
+                rows,
+                key=lambda row: int(row[4]),
+                reverse=True
+        )[:5]:
+            print_history_row(row)
+    else:
+        print("No history found")
+
+def show_last_failed(rows):
+    print("Last Failed Test")
+
+    if rows:
+        failed_found = False
+
+        for row in reversed(rows):
+            if row[2] != "PASS":
+                failed_found = True
+                print_history_row(row)
+                break
+
+        if not failed_found:
+            print("No failed tests found")
+    else:
+        print("No history found")
+
+def show_invalid_response(rows):
+    print("Show Invalid Responses")
+
+    invalid_response_found = False
+
+    for row in rows:
+        if len(row) > 5 and row[5] == "FAIL":
+            invalid_response_found = True
+            print_history_row(row)
+
+    if not invalid_response_found:
+        print("No invalid responses found")
+
+def clear_history(history_file):
+    print("Clear Test History")
+
+    while True:
+        user_input = input(
+            "Are you sure you want to clear all test history? (yes/no): "
+        ).strip().lower()
+
+        if user_input == "yes":
+            with open(history_file, "w", newline="") as file:
+                writer = csv.writer(file)
+
+                writer.writerow([
+                    "Date & Time",
+                    "URL",
+                    "Test Result",
+                    "Status Code",
+                    "Response Time",
+                    "Response Validation",
+                    "JSON Field",
+                    "Field Validation"
+                ])
+
+            print("History has been cleared")
+            break
+
+        elif user_input == "no":
+            break
+
+        else:
+            print("Please enter yes or no")
+
+def show_statistics_history(rows):
+    print("Statistics")
+
+    if rows:
+        show_statistics(rows)
+    else:
+        print("No history found")
+
 def show_history(history_file):
     """Display the API test history menu and handle selections."""
     while True:
@@ -132,174 +343,67 @@ def show_history(history_file):
         print("8. Show Slow Responses")
         print("9. Top 5 Fastest Tests")
         print("10. Top 5 Slowest Tests")
-        print("11. Clear Test History")
-        print("12. Last Failed Test")
-        print("13. Show Invalid Responses")
-        print("14. Search by JSON Field")
-        print("15. Search by Field Validation")
-        print("16. Back to main menu")
+        print("11. Search by JSON Field")
+        print("12. Search by Field Validation")
+        print("13. Search by Date")
+        print("14. Last Failed Test")
+        print("15. Show Invalid Responses")
+        print("16. Clear Test History")
+        print("17. Back to main menu")
 
         history_choice = input("Choose an option: ").strip()
         rows = load_history(history_file)
         print()
 
         if history_choice == "1":
-            print("All tests")
-
-            if rows:
-                for row in rows:
-                    print_history_row(row)
-            else:
-                print("No history found")
+            show_all_tests(rows)
 
         elif history_choice == "2":
-            print("Failed tests")
-
-            if rows:
-                failed_found = False
-                for row in rows:
-                    if row[2] != "PASS":
-                        failed_found = True
-                        print_history_row(row)
-                if not failed_found:
-                    print("No failed tests found")
-            else:
-                print("No history found")
+            show_failed_tests(rows)
 
         elif history_choice == "3":
-            print("Passed tests")
-
-            if rows:
-                passed_found = False
-                for row in rows:
-                    if row[2] == "PASS":
-                        passed_found = True
-                        print_history_row(row)
-                if not passed_found:
-                    print("No passed tests found")
+            show_passed_tests(rows)
 
         elif history_choice == "4":
-            print("Last 5 tests")
-
-            if rows:
-                for row in rows[-5:]:
-                    print_history_row(row)
-
-            else:
-                print("No history found")
+            last_5_tests(rows)
 
         elif history_choice == "5":
-            show_statistics(rows)
+            show_statistics_history(rows)
 
         elif history_choice == "6":
-            search_term = input("Enter URL keyword: ").strip()
-
-            if not search_term:
-                print("Search cannot be empty")
-            else:
-                match_found = False
-
-                for row in rows:
-                    if search_term.lower() in row[1].lower():
-                        match_found = True
-                        print_history_row(row)
-
-                if not match_found:
-                    print("No matching URLs found")
+            search_by_url(rows)
 
         elif history_choice == "7":
-            search_code = input("Enter Status Code: ").strip()
-
-            if not search_code:
-                print("Status code cannot be empty")
-            else:
-                code_match_found = False
-
-                for row in rows:
-                    if search_code == row[3]:
-                        code_match_found = True
-                        print_history_row(row)
-                if not code_match_found:
-                    print("No matching Status Code found ")
+            search_by_statuscode(rows)
 
         elif history_choice == "8":
-            slow_response_found = False
-
-            for row in rows:
-                response_time = int(row[4])
-
-                if response_time > config.slow_response_threshold:
-                    slow_response_found = True
-                    print_history_row(row)
-
-            if not slow_response_found:
-                print("No slow responses found")
+            show_slow_responses(rows)
 
         elif history_choice == "9":
-            if rows:
-                for row in sorted(rows, key=lambda row: int(row[4]))[:5]:
-                    print_history_row(row)
-            else:
-                print("No history found")
+            show_fastest_test(rows)
 
         elif history_choice == "10":
-            if rows:
-                for row in sorted(rows, key=lambda row: int(row[4]), reverse=True)[:5]:
-                    print_history_row(row)
-            else:
-                print("No history found")
+            show_slowest_test(rows)
 
         elif history_choice == "11":
-            while True:
-                user_input = input("Are you sure you want to clear all test history? (yes/no): ").strip().lower()
-
-                if user_input == "yes":
-                    with open(history_file, "w", newline="") as file:
-                        writer = csv.writer(file)
-
-                        writer.writerow(["Time", "URL", "Test Result", "Status Code", "Response Time"])
-                        print("History has been cleared")
-                        break
-
-                elif user_input == "no":
-                    break
-
-                else:
-                    print("Please enter yes or no")
-
-        elif history_choice == "12":
-            if rows:
-                failed_found = False
-                for row in reversed(rows):
-                    if row[2] != "PASS":
-                        failed_found = True
-                        print_history_row(row)
-                        break
-                if not failed_found:
-                    print("No failed tests found")
-            else:
-                print("No history found")
-
-        elif history_choice == "13":
-            print("Invalid Responses")
-
-            invalid_response_found = False
-
-            for row in rows:
-                if len(row) > 5 and row[5] == "FAIL":
-                    invalid_response_found = True
-                    print_history_row(row)
-
-            if not invalid_response_found:
-                print("No invalid responses found")
-
-        elif history_choice == "14":
             search_by_json_field(rows)
 
-        elif history_choice == "15":
+        elif history_choice == "12":
             search_by_field(rows)
 
+        elif history_choice == "13":
+            search_by_date(rows)
+
+        elif history_choice == "14":
+            show_last_failed(rows)
+
+        elif history_choice == "15":
+            show_invalid_response(rows)
+
         elif history_choice == "16":
+            clear_history(history_file)
+
+        elif history_choice == "17":
             return
 
         else:
