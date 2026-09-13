@@ -2,6 +2,61 @@ import json
 
 FILENAME = "profiles.json"
 
+def edit_profile():
+    """Edit an existing API profile."""
+    profiles_data = load_profiles()
+
+    if not profiles_data:
+        print("No profiles found.")
+        return
+
+    for number, profile_name in enumerate(profiles_data, start=1):
+        print(f"{number}. {profile_name}")
+
+    edit_choice = input("Enter profile number to edit: ").strip()
+
+    try:
+        edit_number = int(edit_choice)
+
+        if edit_number < 1 or edit_number > len(profiles_data):
+            print("Invalid profile number.")
+            return
+
+    except ValueError:
+        print("Please enter a valid profile number.")
+        return
+
+    profile_names = list(profiles_data.keys())
+    profile_name = profile_names[edit_number - 1]
+    profile_data = profiles_data[profile_name]
+
+    print(f"Editing profile: {profile_name}")
+    print(f"Current URL: {profile_data['url']}")
+    print(f"Current JSON field: {profile_data['field']}")
+
+    new_url = input("Enter new API URL: ").strip()
+
+    if not new_url:
+        new_url = profile_data["url"]
+
+    if not new_url.startswith(("http://", "https://")):
+        print("URL must start with http:// or https://")
+        return
+
+    new_field = input("Enter new JSON field: ").strip()
+
+    if not new_field:
+        new_field = profile_data["field"]
+
+    profiles_data[profile_name] = {
+        "url": new_url,
+        "field": new_field
+    }
+
+    with open(FILENAME, "w", encoding="utf-8") as file:
+        json.dump(profiles_data, file, indent=4)
+
+    print(f"Profile '{profile_name}' updated successfully.")
 
 def profiles_menu():
     """Display the API profiles menu and handle profile actions."""
@@ -11,7 +66,8 @@ def profiles_menu():
         print("1. View profiles")
         print("2. Add profile")
         print("3. Delete profile")
-        print("4. Back")
+        print("4. Edit profile")
+        print("5. Back")
 
         profile_choice = input("Choose an option: ").strip()
 
@@ -99,6 +155,9 @@ def profiles_menu():
                 print("Please enter a valid profile number.")
 
         elif profile_choice == "4":
+            edit_profile()
+
+        elif profile_choice == "5":
             return
 
         else:
