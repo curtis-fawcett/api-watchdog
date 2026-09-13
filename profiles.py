@@ -21,10 +21,14 @@ def profiles_menu():
             if not profiles_data:
                 print("No profiles found. Please create a profile first.")
             else:
-                for number, (profile_name, api_url) in enumerate(
-                    profiles_data.items(), start=1
+                for number, (profile_name, profile_data) in enumerate(
+                        profiles_data.items(), start=1
                 ):
-                    print(f"{number}. {profile_name} - {api_url}")
+                    print(
+                        f"{number}. {profile_name} - "
+                        f"{profile_data['url']} - "
+                        f"Field: {profile_data['field']}"
+                    )
 
         elif profile_choice == "2":
             profiles_data = load_profiles()
@@ -41,12 +45,16 @@ def profiles_menu():
                     continue
 
                 api_url = input("Enter the API URL: ").strip()
+                field_name = input("Enter JSON field to verify (optional): ").strip()
 
                 if not api_url.startswith(("http://", "https://")):
                     print("URL must start with http:// or https://")
                     continue
 
-                profiles_data[profile_name] = api_url
+                profiles_data[profile_name] = {
+                    "url": api_url,
+                    "field": field_name
+                }
 
                 with open(FILENAME, "w", encoding="utf-8") as file:
                     json.dump(profiles_data, file, indent=4)

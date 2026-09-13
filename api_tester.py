@@ -79,10 +79,16 @@ def test_all_profiles(history_file):
     successful_tests = 0
     invalid_responses = 0
 
-    for profile_name, api_url in profiles_data.items():
+    for profile_name, profile_data in profiles_data.items():
         total_tests += 1
 
-        test_result, status_code, response_time, response_valid, field_valid = test_api(api_url, "")
+        url = profile_data["url"]
+        field_name = profile_data["field"]
+
+        test_result, status_code, response_time, response_valid, field_valid = test_api(
+            url,
+            field_name
+        )
 
         if response_time is not None:
             total_response_time += response_time
@@ -99,13 +105,13 @@ def test_all_profiles(history_file):
         if test_result is not None:
             save_test_result(
                 history_file,
-                api_url,
+                url,
                 test_result,
                 status_code,
                 response_time,
                 response_valid,
-                "",
-                True
+                field_name,
+                field_valid
             )
 
         if test_result is None:
@@ -222,7 +228,7 @@ def run_api_test(history_file):
             print("No profiles found. Please create a profile first.")
             return
 
-        for number, (profile_name, api_url) in enumerate(profiles_data.items(), start=1):
+        for number, profile_name in enumerate(profiles_data, start=1):
             print(f"{number}. {profile_name}")
 
         profile_selection = input("Enter profile number: ").strip()
@@ -236,7 +242,9 @@ def run_api_test(history_file):
                 return
 
             profile_name = profile_names[profile_number - 1]
-            url = profiles_data[profile_name]
+            profile_data = profiles_data[profile_name]
+            url = profile_data["url"]
+            field_name = profile_data["field"]
 
         except ValueError:
             print("Please enter a valid number.")
@@ -244,6 +252,9 @@ def run_api_test(history_file):
 
     elif test_choice == "2":
         url = input("Enter API URL: ").strip()
+        field_name = input(
+            "Enter JSON field to verify (optional): "
+        ).strip()
 
     elif test_choice == "3":
         test_all_profiles(history_file)
@@ -255,10 +266,6 @@ def run_api_test(history_file):
     else:
         print("Invalid option.")
         return
-
-    field_name = input(
-        "Enter JSON field to verify (optional): "
-    ).strip()
 
     run_single_test(history_file, url, field_name)
 

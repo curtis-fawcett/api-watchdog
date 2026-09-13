@@ -1,4 +1,14 @@
 {
-    "JSONPlaceholder Users": "https://jsonplaceholder.typicode.com/users",
-    "JSONPlaceholder Posts": "https://jsonplaceholder.typicode.com/posts"
+    "JSONPlaceholder Users": {
+        "url": "https://jsonplaceholder.typicode.com/users",
+        "field": "id"
+    },
+    "JSONPlaceholder Posts": {
+        "url": "https://jsonplaceholder.typicode.com/posts",
+        "field": "id"
+    },
+    "JSON Test": {
+        "url": "https://jsonplaceholder.typicode.com/users",
+        "field": "id"
+    }
 }
