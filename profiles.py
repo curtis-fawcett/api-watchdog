@@ -13,10 +13,15 @@ def edit_profile():
     for number, profile_name in enumerate(profiles_data, start=1):
         print(f"{number}. {profile_name}")
 
+    print("0. Back")
+
     edit_choice = input("Enter profile number to edit: ").strip()
 
     try:
         edit_number = int(edit_choice)
+
+        if edit_number == 0:
+            return
 
         if edit_number < 1 or edit_number > len(profiles_data):
             print("Invalid profile number.")
@@ -86,39 +91,87 @@ def profiles_menu():
                         f"Field: {profile_data['field']}"
                     )
 
+
         elif profile_choice == "2":
+
             profiles_data = load_profiles()
 
             try:
-                profile_name = input("Enter profile name: ").strip()
 
-                if not profile_name:
+                profile_name = input(
+
+                    "Enter profile name (or 0 to go back): "
+
+                ).strip()
+
+                if profile_name == "0":
+                    continue
+
+                while not profile_name:
+
                     print("Profile name cannot be empty.")
+
+                    profile_name = input(
+
+                        "Enter profile name (or 0 to go back): "
+
+                    ).strip()
+
+                    if profile_name == "0":
+                        break
+
+                if profile_name == "0":
                     continue
 
-                if profile_name in profiles_data:
+                while profile_name in profiles_data:
+
                     print("A profile with that name already exists.")
+
+                    profile_name = input(
+
+                        "Enter profile name (or 0 to go back): "
+
+                    ).strip()
+
+                    if profile_name == "0":
+                        break
+
+                if profile_name == "0":
                     continue
 
-                api_url = input("Enter the API URL: ").strip()
-                field_name = input("Enter JSON field to verify (optional): ").strip()
+                while True:
+                    api_url = input("Enter the API URL: ").strip()
 
-                if not api_url.startswith(("http://", "https://")):
+                    if api_url.startswith(("http://", "https://")):
+                        break
+
                     print("URL must start with http:// or https://")
-                    continue
+
+                field_name = input(
+
+                    "Enter JSON field to verify (optional): "
+
+                ).strip()
 
                 profiles_data[profile_name] = {
+
                     "url": api_url,
+
                     "field": field_name
+
                 }
 
                 with open(FILENAME, "w", encoding="utf-8") as file:
+
                     json.dump(profiles_data, file, indent=4)
 
                 print(f"Profile '{profile_name}' added successfully.")
+
                 print()
 
+
             except OSError as error:
+
                 print(f"An error occurred while saving: {error}")
 
         elif profile_choice == "3":
@@ -133,10 +186,15 @@ def profiles_menu():
             for number, profile_name in enumerate(profile_names, start=1):
                 print(f"{number}. {profile_name}")
 
+            print("0. Back")
+
             delete_choice = input("Enter profile number to delete: ").strip()
 
             try:
                 delete_number = int(delete_choice)
+
+                if delete_number == 0:
+                    continue
 
                 if delete_number < 1 or delete_number > len(profile_names):
                     print("Invalid profile number.")
