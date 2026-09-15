@@ -2,6 +2,83 @@ import json
 
 FILENAME = "profiles.json"
 
+def add_profile():
+    profiles_data = load_profiles()
+
+    try:
+
+        profile_name = input(
+
+            "Enter profile name (or 0 to go back): "
+
+        ).strip()
+
+        if profile_name == "0":
+            return
+
+        while not profile_name:
+
+            print("Profile name cannot be empty.")
+
+            profile_name = input(
+
+                "Enter profile name (or 0 to go back): "
+
+            ).strip()
+
+            if profile_name == "0":
+                break
+
+        if profile_name == "0":
+            return
+
+        while profile_name in profiles_data:
+
+            print("A profile with that name already exists.")
+
+            profile_name = input(
+
+                "Enter profile name (or 0 to go back): "
+
+            ).strip()
+
+            if profile_name == "0":
+                break
+
+        if profile_name == "0":
+            return
+
+        while True:
+            api_url = input("Enter the API URL (or 0 to go back): ").strip()
+
+            if api_url == "0":
+                return
+
+            if api_url.startswith(("http://", "https://")):
+                break
+
+            print("URL must start with http:// or https://")
+
+        field_name = input("Enter JSON field to verify (optional, or 0 to go back): ").strip()
+
+        if field_name == "0":
+            return
+
+        profiles_data[profile_name] = {
+            "url": api_url,
+            "field": field_name
+        }
+
+        with open(FILENAME, "w", encoding="utf-8") as file:
+            json.dump(profiles_data, file, indent=4)
+
+        print(f"Profile '{profile_name}' added successfully.")
+        print()
+
+
+    except OSError as error:
+        print(f"An error occurred while saving: {error}")
+
 def edit_profile():
     """Edit an existing API profile."""
     profiles_data = load_profiles()
@@ -95,87 +172,7 @@ def profiles_menu():
 
 
         elif profile_choice == "2":
-
-            profiles_data = load_profiles()
-
-            try:
-
-                profile_name = input(
-
-                    "Enter profile name (or 0 to go back): "
-
-                ).strip()
-
-                if profile_name == "0":
-                    continue
-
-                while not profile_name:
-
-                    print("Profile name cannot be empty.")
-
-                    profile_name = input(
-
-                        "Enter profile name (or 0 to go back): "
-
-                    ).strip()
-
-                    if profile_name == "0":
-                        break
-
-                if profile_name == "0":
-                    continue
-
-                while profile_name in profiles_data:
-
-                    print("A profile with that name already exists.")
-
-                    profile_name = input(
-
-                        "Enter profile name (or 0 to go back): "
-
-                    ).strip()
-
-                    if profile_name == "0":
-                        break
-
-                if profile_name == "0":
-                    continue
-
-                while True:
-                    api_url = input("Enter the API URL: ").strip()
-
-                    if api_url.startswith(("http://", "https://")):
-                        break
-
-                    print("URL must start with http:// or https://")
-
-                field_name = input(
-
-                    "Enter JSON field to verify (optional): "
-
-                ).strip()
-
-                profiles_data[profile_name] = {
-
-                    "url": api_url,
-
-                    "field": field_name
-
-                }
-
-                with open(FILENAME, "w", encoding="utf-8") as file:
-
-                    json.dump(profiles_data, file, indent=4)
-
-                print(f"Profile '{profile_name}' added successfully.")
-
-                print()
-
-
-            except OSError as error:
-
-                print(f"An error occurred while saving: {error}")
-
+            add_profile()
 
         elif profile_choice == "3":
             profiles_data = load_profiles()
