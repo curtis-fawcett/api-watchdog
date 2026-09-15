@@ -15,21 +15,23 @@ def edit_profile():
 
     print("0. Back")
 
-    edit_choice = input("Enter profile number to edit: ").strip()
+    while True:
+        edit_choice = input("Enter profile number to edit: ").strip()
 
-    try:
-        edit_number = int(edit_choice)
+        try:
+            edit_number = int(edit_choice)
 
-        if edit_number == 0:
-            return
+            if edit_number == 0:
+                return
 
-        if edit_number < 1 or edit_number > len(profiles_data):
-            print("Invalid profile number.")
-            return
+            if edit_number < 1 or edit_number > len(profiles_data):
+                print("Invalid profile number.")
+                continue
 
-    except ValueError:
-        print("Please enter a valid profile number.")
-        return
+            break
+
+        except ValueError:
+            print("Please enter a valid profile number.")
 
     profile_names = list(profiles_data.keys())
     profile_name = profile_names[edit_number - 1]
@@ -174,6 +176,7 @@ def profiles_menu():
 
                 print(f"An error occurred while saving: {error}")
 
+
         elif profile_choice == "3":
             profiles_data = load_profiles()
 
@@ -183,34 +186,36 @@ def profiles_menu():
 
             profile_names = list(profiles_data.keys())
 
-            for number, profile_name in enumerate(profile_names, start=1):
-                print(f"{number}. {profile_name}")
+            while True:
+                for number, profile_name in enumerate(profile_names, start=1):
+                    print(f"{number}. {profile_name}")
 
-            print("0. Back")
+                print("0. Back")
 
-            delete_choice = input("Enter profile number to delete: ").strip()
+                delete_choice = input("Enter profile number to delete: ").strip()
 
-            try:
-                delete_number = int(delete_choice)
+                try:
+                    delete_number = int(delete_choice)
 
-                if delete_number == 0:
-                    continue
+                    if delete_number == 0:
+                        break
 
-                if delete_number < 1 or delete_number > len(profile_names):
-                    print("Invalid profile number.")
-                    continue
+                    if delete_number < 1 or delete_number > len(profile_names):
+                        print("Invalid profile number.")
+                        continue
 
-                profile_name = profile_names[delete_number - 1]
-                del profiles_data[profile_name]
+                    profile_name = profile_names[delete_number - 1]
+                    del profiles_data[profile_name]
 
-                with open(FILENAME, "w", encoding="utf-8") as file:
-                    json.dump(profiles_data, file, indent=4)
+                    with open(FILENAME, "w", encoding="utf-8") as file:
+                        json.dump(profiles_data, file, indent=4)
 
-                print(f"Profile '{profile_name}' deleted successfully.")
-                print()
+                    print(f"Profile '{profile_name}' deleted successfully.")
+                    print()
+                    break
 
-            except ValueError:
-                print("Please enter a valid profile number.")
+                except ValueError:
+                    print("Please enter a valid profile number.")
 
         elif profile_choice == "4":
             edit_profile()
