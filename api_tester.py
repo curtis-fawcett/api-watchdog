@@ -20,19 +20,19 @@ def test_api(url, field_name):
 
     except requests.exceptions.ConnectionError:
         print("Connection failed")
-        return None, None, None
+        return None, None, None, False, False
 
     except requests.exceptions.Timeout:
         print("Connection timed out")
-        return None, None, None
+        return None, None, None, False, False
 
     except requests.exceptions.MissingSchema:
         print("Invalid URL. Include http:// or https://")
-        return None, None, None
+        return None, None, None, False, False
 
     except requests.exceptions.RequestException:
         print("Request failed")
-        return None, None, None
+        return None, None, None, False, False
 
     response_time = int(response.elapsed.total_seconds() * 1000)
 
