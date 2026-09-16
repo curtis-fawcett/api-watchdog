@@ -96,7 +96,7 @@ def test_all_profiles(history_file):
 
         if test_result == "PASS":
             passed_tests += 1
-        else:
+        elif test_result == "FAIL":
             failed_tests += 1
 
         if not response_valid:
