@@ -213,73 +213,78 @@ def run_single_test(history_file, url, field_name):
 
 def run_api_test(history_file):
     """Display the API test menu and run the selected test."""
-    print("Test an API")
-    print()
-    print("1. Use a saved profile")
-    print("2. Enter a custom URL")
-    print("3. Test all profiles")
-    print("4. Back")
+    while True:
+        print("Test an API")
+        print()
+        print("1. Use a saved profile")
+        print("2. Enter a custom URL")
+        print("3. Test all profiles")
+        print("4. Back")
 
-    test_choice = input("Choose an option: ").strip()
+        test_choice = input("Choose an option: ").strip()
 
-    if test_choice == "1":
-        profiles_data = load_profiles()
-        if not profiles_data:
-            print("No profiles found. Please create a profile first.")
+        if test_choice == "1":
+            profiles_data = load_profiles()
+
+            if not profiles_data:
+                print("No profiles found. Please create a profile first.")
+                continue
+
+            for number, profile_name in enumerate(profiles_data, start=1):
+                print(f"{number}. {profile_name}")
+
+            profile_names = list(profiles_data.keys())
+
+            while True:
+                profile_selection = input(
+                    "Enter profile number (or 0 to go back): "
+                ).strip()
+
+                try:
+                    profile_number = int(profile_selection)
+
+                    if profile_number == 0:
+                        break
+
+                    if profile_number < 1 or profile_number > len(profile_names):
+                        print("Invalid profile number.")
+                        continue
+
+                    profile_name = profile_names[profile_number - 1]
+                    profile_data = profiles_data[profile_name]
+                    url = profile_data["url"]
+                    field_name = profile_data["field"]
+                    run_single_test(history_file, url, field_name)
+                    break
+
+                except ValueError:
+                    print("Please enter a valid number.")
+
+        elif test_choice == "2":
+            url = input("Enter API URL (or 0 to go back): ").strip()
+
+            if url == "0":
+                continue
+
+            if not url:
+                print("URL cannot be empty.")
+                continue
+
+            field_name = input("Enter JSON field to verify (optional, or 0 to go back): ").strip()
+
+            if field_name == "0":
+                continue
+
+            run_single_test(history_file, url, field_name)
+
+        elif test_choice == "3":
+            test_all_profiles(history_file)
+
+        elif test_choice == "4":
             return
 
-        for number, profile_name in enumerate(profiles_data, start=1):
-            print(f"{number}. {profile_name}")
-
-        profile_names = list(profiles_data.keys())
-
-        while True:
-            profile_selection = input(
-                "Enter profile number (or 0 to go back): "
-            ).strip()
-
-            try:
-                profile_number = int(profile_selection)
-
-                if profile_number == 0:
-                    return
-
-                if profile_number < 1 or profile_number > len(profile_names):
-                    print("Invalid profile number.")
-                    continue
-
-                profile_name = profile_names[profile_number - 1]
-                profile_data = profiles_data[profile_name]
-                url = profile_data["url"]
-                field_name = profile_data["field"]
-                break
-
-            except ValueError:
-                print("Please enter a valid number.")
-
-
-    elif test_choice == "2":
-        url = input("Enter API URL: ").strip()
-
-        if not url:
-            print("URL cannot be empty.")
-            return
-
-        field_name = input(
-            "Enter JSON field to verify (optional): ").strip()
-
-    elif test_choice == "3":
-        test_all_profiles(history_file)
-        return
-
-    elif test_choice == "4":
-        return
-
-    else:
-        print("Invalid option.")
-        return
-
-    run_single_test(history_file, url, field_name)
+        else:
+            print("Invalid option.")
 
 
 def check_json_field(response, field_name):
