@@ -76,7 +76,7 @@ def test_all_profiles(history_file):
     passed_tests = 0
     failed_tests = 0
     total_response_time = 0
-    successful_tests = 0
+    responses_received = 0
     invalid_responses = 0
 
     for profile_name, profile_data in profiles_data.items():
@@ -92,7 +92,7 @@ def test_all_profiles(history_file):
 
         if response_time is not None:
             total_response_time += response_time
-            successful_tests += 1
+            responses_received += 1
 
         if test_result == "PASS":
             passed_tests += 1
@@ -128,8 +128,8 @@ def test_all_profiles(history_file):
 
     # Calculate average response time
     average_response_time = (
-        total_response_time / successful_tests
-        if successful_tests > 0
+        total_response_time / responses_received
+        if responses_received > 0
         else 0
     )
 
@@ -137,7 +137,7 @@ def test_all_profiles(history_file):
     print(f"{total_tests} APIs tested")
     print(f"{passed_tests} Passed")
     print(f"{failed_tests} Failed")
-    print(f"{successful_tests} Responses received")
+    print(f"{responses_received} Responses received")
     print(f"{invalid_responses} Invalid Responses")
     print(f"Average Response Time: {round(average_response_time, 1)} ms")
 
