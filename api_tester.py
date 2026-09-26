@@ -8,9 +8,8 @@ from profiles import load_profiles
 
 
 def test_api(url, field_name):
-    """Test an API URL and return the result, status code, and response time."""
+    """Test an API URL and return the result and validation details."""
     failure_result = (None, None, None, False, False)
-
     url = url.strip()
 
     if not url:
@@ -37,19 +36,14 @@ def test_api(url, field_name):
         return failure_result
 
     response_time = int(response.elapsed.total_seconds() * 1000)
-
     response_valid = validate_response(response)
-
-    if response_valid:
-        field_valid = check_json_field(response, field_name)
-    else:
-        field_valid = False
+    field_valid = check_json_field(response, field_name) if response_valid else False
 
     result = (
         "PASS"
         if 200 <= response.status_code < 300
-           and response_valid
-           and field_valid
+        and response_valid
+        and field_valid
         else "FAIL"
     )
 
@@ -100,8 +94,7 @@ def test_all_profiles(history_file):
             passed_tests += 1
         elif test_result == "FAIL":
             failed_tests += 1
-
-        if test_result is None:
+        else:
             failed_tests += 1
 
         if test_result is not None and not response_valid:
@@ -128,7 +121,6 @@ def test_all_profiles(history_file):
                 f"{response_time} ms)"
             )
 
-    # Calculate average response time
     average_response_time = (
         total_response_time / responses_received
         if responses_received > 0
@@ -178,6 +170,7 @@ def save_test_result(
 ):
     """Save a completed API test result to the history file."""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
     save_result(
         history_file,
         timestamp,
@@ -193,7 +186,10 @@ def save_test_result(
 
 def run_single_test(history_file, url, field_name):
     """Run one API test, save the result, and display the outcome."""
-    test_result, status_code, response_time, response_valid, field_valid = test_api(url, field_name)
+    test_result, status_code, response_time, response_valid, field_valid = test_api(
+        url,
+        field_name
+    )
 
     if test_result is not None:
         save_test_result(
@@ -229,74 +225,10 @@ def run_api_test(history_file):
         test_choice = input("Choose an option: ").strip()
 
         if test_choice == "1":
-            profiles_data = load_profiles()
-
-            if not profiles_data:
-                print("No profiles found. Please create a profile first.")
-                continue
-
-            for number, profile_name in enumerate(profiles_data, start=1):
-                print(f"{number}. {profile_name}")
-
-            profile_names = list(profiles_data.keys())
-
-            while True:
-                profile_selection = input(
-                    "Enter profile number (or 0 to go back): "
-                ).strip()
-
-                try:
-                    profile_number = int(profile_selection)
-
-                    if profile_number == 0:
-                        break
-
-                    if profile_number < 1 or profile_number > len(profile_names):
-                        print("Invalid profile number.")
-                        continue
-
-                    profile_name = profile_names[profile_number - 1]
-                    profile_data = profiles_data[profile_name]
-                    url = profile_data["url"]
-                    field_name = profile_data["field"]
-                    run_single_test(history_file, url, field_name)
-                    break
-
-                except ValueError:
-                    print("Please enter a valid number.")
+            run_saved_profile_test(history_file)
 
         elif test_choice == "2":
-            url = input("Enter API URL (or 0 to go back): ").strip()
-
-            if url == "0":
-                continue
-
-            while not url:
-                print("URL cannot be empty.")
-                url = input("Enter API URL (or 0 to go back): ").strip()
-
-                if url == "0":
-                    break
-
-            if url == "0":
-                continue
-
-            while not url.startswith(("http://", "https://")):
-                print("URL must start with http:// or https://")
-                url = input("Enter API URL (or 0 to go back): ").strip()
-
-                if url == "0":
-                    break
-
-            if url == "0":
-                continue
-
-            field_name = input("Enter JSON field to verify (optional, or 0 to go back): ").strip()
-
-            if field_name == "0":
-                continue
-
-            run_single_test(history_file, url, field_name)
+            run_custom_url_test(history_file)
 
         elif test_choice == "3":
             test_all_profiles(history_file)
@@ -308,7 +240,81 @@ def run_api_test(history_file):
             print("Invalid option.")
 
 
+def run_saved_profile_test(history_file):
+    """Allow the user to select and test a saved API profile."""
+    profiles_data = load_profiles()
+
+    if not profiles_data:
+        print("No profiles found. Please create a profile first.")
+        return
+
+    for number, profile_name in enumerate(profiles_data, start=1):
+        print(f"{number}. {profile_name}")
+
+    profile_names = list(profiles_data.keys())
+
+    while True:
+        profile_selection = input(
+            "Enter profile number (or 0 to go back): "
+        ).strip()
+
+        try:
+            profile_number = int(profile_selection)
+
+            if profile_number == 0:
+                return
+
+            if profile_number < 1 or profile_number > len(profile_names):
+                print("Invalid profile number.")
+                continue
+
+            profile_name = profile_names[profile_number - 1]
+            profile_data = profiles_data[profile_name]
+
+            run_single_test(
+                history_file,
+                profile_data["url"],
+                profile_data["field"]
+            )
+            return
+
+        except ValueError:
+            print("Please enter a valid number.")
+
+
+def run_custom_url_test(history_file):
+    """Allow the user to test a custom API URL."""
+    url = input("Enter API URL (or 0 to go back): ").strip()
+
+    if url == "0":
+        return
+
+    while not url:
+        print("URL cannot be empty.")
+        url = input("Enter API URL (or 0 to go back): ").strip()
+
+        if url == "0":
+            return
+
+    while not url.startswith(("http://", "https://")):
+        print("URL must start with http:// or https://")
+        url = input("Enter API URL (or 0 to go back): ").strip()
+
+        if url == "0":
+            return
+
+    field_name = input(
+        "Enter JSON field to verify (optional, or 0 to go back): "
+    ).strip()
+
+    if field_name == "0":
+        return
+
+    run_single_test(history_file, url, field_name)
+
+
 def check_json_field(response, field_name):
+    """Check whether a JSON response contains the requested field."""
     if not field_name:
         return True
 
@@ -317,6 +323,7 @@ def check_json_field(response, field_name):
     if isinstance(json_data, list):
         if not json_data:
             return False
+
         return all(
             isinstance(item, dict) and field_name in item
             for item in json_data
