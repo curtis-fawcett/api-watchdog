@@ -13,7 +13,7 @@ def test_api(url, field_name):
 
     if not url:
         print("URL cannot be empty")
-        return None, None, None
+        return None, None, None, False, False
 
     try:
         response = requests.get(url, timeout=5)
