@@ -317,7 +317,10 @@ def check_json_field(response, field_name):
     if isinstance(json_data, list):
         if not json_data:
             return False
-        return all(isinstance(user, dict) and field_name in user for user in json_data)
+        return all(
+            isinstance(item, dict) and field_name in item
+            for item in json_data
+        )
 
     if isinstance(json_data, dict):
         return field_name in json_data
