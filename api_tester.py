@@ -266,8 +266,24 @@ def run_api_test(history_file):
             if url == "0":
                 continue
 
-            if not url:
+            while not url:
                 print("URL cannot be empty.")
+                url = input("Enter API URL (or 0 to go back): ").strip()
+
+                if url == "0":
+                    break
+
+            if url == "0":
+                continue
+
+            while not url.startswith(("http://", "https://")):
+                print("URL must start with http:// or https://")
+                url = input("Enter API URL (or 0 to go back): ").strip()
+
+                if url == "0":
+                    break
+
+            if url == "0":
                 continue
 
             field_name = input("Enter JSON field to verify (optional, or 0 to go back): ").strip()
