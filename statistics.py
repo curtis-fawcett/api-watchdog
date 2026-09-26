@@ -4,10 +4,29 @@ import config
 def show_statistics(rows):
     """Display statistics for the API test history."""
     total_tests = len(rows)
+
+    if total_tests == 0:
+        print("Total Tests:", 0)
+        print("Passed:", 0)
+        print("Failed:", 0)
+        print("Invalid Responses:", 0)
+        print("Pass Rate:", 0, "%")
+        print("Average Response Time:", 0, "ms")
+        print(
+            "Slow Responses",
+            f"(> {config.slow_response_threshold} ms):",
+            0,
+        )
+        print("Slow Response Rate:", 0, "%")
+        print("No response time data available")
+        print("No status code data available")
+        print("No URL data available")
+        return
+
     passed_tests = 0
     slow_responses = 0
-    total_response_time = 0
     invalid_responses = 0
+    total_response_time = 0
 
     fastest_response_time = None
     slowest_response_time = None
@@ -33,11 +52,17 @@ def show_statistics(rows):
         if response_time > config.slow_response_threshold:
             slow_responses += 1
 
-        if fastest_response_time is None or response_time < fastest_response_time:
+        if (
+            fastest_response_time is None
+            or response_time < fastest_response_time
+        ):
             fastest_response_time = response_time
             fastest_url = url
 
-        if slowest_response_time is None or response_time > slowest_response_time:
+        if (
+            slowest_response_time is None
+            or response_time > slowest_response_time
+        ):
             slowest_response_time = response_time
             slowest_url = url
 
@@ -45,15 +70,9 @@ def show_statistics(rows):
         status_counts[status_code] = status_counts.get(status_code, 0) + 1
 
     failed_tests = total_tests - passed_tests
-
-    if total_tests == 0:
-        pass_rate = 0
-        average_response_time = 0
-        slow_response_rate = 0
-    else:
-        pass_rate = round(passed_tests / total_tests * 100, 1)
-        average_response_time = round(total_response_time / total_tests, 1)
-        slow_response_rate = round(slow_responses / total_tests * 100, 1)
+    pass_rate = round(passed_tests / total_tests * 100, 1)
+    average_response_time = round(total_response_time / total_tests, 1)
+    slow_response_rate = round(slow_responses / total_tests * 100, 1)
 
     print("Total Tests:", total_tests)
     print("Passed:", passed_tests)
@@ -67,12 +86,6 @@ def show_statistics(rows):
         slow_responses,
     )
     print("Slow Response Rate:", slow_response_rate, "%")
-
-    if total_tests == 0:
-        print("No response time data available")
-        print("No status code data available")
-        print("No URL data available")
-        return
 
     print("Fastest Response Time:", fastest_response_time, "ms")
     print("Slowest Response Time:", slowest_response_time, "ms")
