@@ -99,7 +99,10 @@ def test_all_profiles(history_file):
         elif test_result == "FAIL":
             failed_tests += 1
 
-        if not response_valid:
+        if test_result is None:
+            failed_tests += 1
+
+        if test_result is not None and not response_valid:
             invalid_responses += 1
 
         if test_result is not None:
