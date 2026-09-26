@@ -87,12 +87,15 @@ def edit_profile():
         print("No profiles found.")
         return
 
-    for number, profile_name in enumerate(profiles_data, start=1):
-        print(f"{number}. {profile_name}")
-
-    print("0. Back")
-
     while True:
+        print("Edit Profile")
+        print()
+
+        for number, profile_name in enumerate(profiles_data, start=1):
+            print(f"{number}. {profile_name}")
+
+        print("0. Back")
+
         edit_choice = input("Enter profile number to edit: ").strip()
 
         try:
@@ -105,42 +108,61 @@ def edit_profile():
                 print("Invalid profile number.")
                 continue
 
-            break
-
         except ValueError:
             print("Please enter a valid profile number.")
+            continue
 
-    profile_names = list(profiles_data.keys())
-    profile_name = profile_names[edit_number - 1]
-    profile_data = profiles_data[profile_name]
+        profile_names = list(profiles_data.keys())
+        profile_name = profile_names[edit_number - 1]
+        profile_data = profiles_data[profile_name]
 
-    print(f"Editing profile: {profile_name}")
-    print(f"Current URL: {profile_data['url']}")
-    print(f"Current JSON field: {profile_data['field']}")
+        print()
+        print(f"Editing profile: {profile_name}")
+        print(f"Current URL: {profile_data['url']}")
+        print(f"Current JSON field: {profile_data['field']}")
 
-    new_url = input("Enter new API URL: ").strip()
+        new_url = input(
+            "Enter new API URL (or 0 to go back): "
+        ).strip()
 
-    if not new_url:
-        new_url = profile_data["url"]
+        if new_url == "0":
+            continue
 
-    if not new_url.startswith(("http://", "https://")):
-        print("URL must start with http:// or https://")
-        return
+        if not new_url:
+            new_url = profile_data["url"]
 
-    new_field = input("Enter new JSON field: ").strip()
+        while not new_url.startswith(("http://", "https://")):
+            print("URL must start with http:// or https://")
+            new_url = input(
+                "Enter new API URL (or 0 to go back): "
+            ).strip()
 
-    if not new_field:
-        new_field = profile_data["field"]
+            if new_url == "0":
+                break
 
-    profiles_data[profile_name] = {
-        "url": new_url,
-        "field": new_field
-    }
+        if new_url == "0":
+            continue
 
-    with open(FILENAME, "w", encoding="utf-8") as file:
-        json.dump(profiles_data, file, indent=4)
+        new_field = input(
+            "Enter new JSON field (optional, or 0 to go back): "
+        ).strip()
 
-    print(f"Profile '{profile_name}' updated successfully.")
+        if new_field == "0":
+            continue
+
+        if not new_field:
+            new_field = profile_data["field"]
+
+        profiles_data[profile_name] = {
+            "url": new_url,
+            "field": new_field
+        }
+
+        with open(FILENAME, "w", encoding="utf-8") as file:
+            json.dump(profiles_data, file, indent=4)
+
+        print(f"Profile '{profile_name}' updated successfully.")
+        print()
 
 def profiles_menu():
     """Display the API profiles menu and handle profile actions."""
