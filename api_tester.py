@@ -9,30 +9,32 @@ from profiles import load_profiles
 
 def test_api(url, field_name):
     """Test an API URL and return the result, status code, and response time."""
+    failure_result = (None, None, None, False, False)
+
     url = url.strip()
 
     if not url:
         print("URL cannot be empty")
-        return None, None, None, False, False
+        return failure_result
 
     try:
         response = requests.get(url, timeout=5)
 
     except requests.exceptions.ConnectionError:
         print("Connection failed")
-        return None, None, None, False, False
+        return failure_result
 
     except requests.exceptions.Timeout:
         print("Connection timed out")
-        return None, None, None, False, False
+        return failure_result
 
     except requests.exceptions.MissingSchema:
         print("Invalid URL. Include http:// or https://")
-        return None, None, None, False, False
+        return failure_result
 
     except requests.exceptions.RequestException:
         print("Request failed")
-        return None, None, None, False, False
+        return failure_result
 
     response_time = int(response.elapsed.total_seconds() * 1000)
 
